@@ -1,13 +1,17 @@
 FROM ubuntu:20.04
 RUN echo "This is a analysis pipelie for SAC-seq data" > /README.md
-ENV PATH="/opt/miniconda/bin:$PATH"
+
+ENV PATH="/opt/pipeline/bin:/opt/miniconda/bin:$PATH"
 
 # install system dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y --no-install-recommends install tzdata apt-utils wget git make cmake xsltproc gcc g++ pkg-config zlib1g-dev python3 python3-distutils default-jre
+# install pip
+# wget https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py
+# python3 /tmp/get-pip.py
 # install miniconda
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.11.0-Linux-x86_64.sh -O /tmp/miniconda.sh && bash /tmp/miniconda.sh -b -p /opt/miniconda && rm -rf /tmp/miniconda.sh && export PATH="/opt/miniconda/bin:$PATH"
 # install package by conda
-RUN conda install mamba -n base -y -c conda-forge && mamba install -y -c conda-forge libzlib && mamba install -y -c bioconda falco bowtie2 star samtools==1.14 bedtools fastp seqtk blast subread numpy pandas pysam pyfaidx && mamba clean -afy && pip3 install snakemake==6.15.5 cutadapt==3.5 multiqc 
+RUN conda install mamba -n base -y -c conda-forge && mamba install -y -c conda-forge libzlib && mamba install -y -c bioconda falco bowtie2 star samtools==1.14 bedtools fastp seqtk blast subread numpy pandas pysam pyfaidx && mamba clean -afy && pip3 install snakemake==6.15.5 cutadapt==3.5 multiqc Flask
 # install software directly
 RUN wget https://github.com/getzlab/rnaseqc/releases/download/v2.4.2/rnaseqc.v2.4.2.linux.gz -O /opt/rnaseqc.gz && gunzip /opt/rnaseqc.gz && chmod +x /opt/rnaseqc
 # install blast2bam
@@ -19,4 +23,10 @@ RUN git clone https://github.com/Daniel-Liu-c0deb0t/UMICollapse.git /opt/UMIColl
 # install cpup
 RUN git clone https://github.com/y9c/cpup.git /opt/cpup && make -C /opt/cpup/ -j
 RUN rm -rf /var/lib/apt/lists/* && apt-get purge -y wget git make cmake xsltproc gcc g++ pkg-config && apt-get clean
+
 RUN mkdir -p /data
+WORKDIR /data
+ADD ./bin /opt/pipeline/bin
+COPY ./Snakefile /opt/pipeline/Snakefile
+COPY ./config.yaml /opt/pipeline/config.yaml
+COPY ./sacseq /opt/pipeline/bin/sacseq

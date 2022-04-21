@@ -87,12 +87,12 @@ bowtie2-build ${outdir}/spike_expand.fa ${outdir}/spike_expand 1>${logfile} 2>${
 # prepare contamination index
 
 # prepare rRNA/ smallRNA/ genome index (base on different species)
-if [ "$species" = "human" ]; then
+if [[ "$species" == "human" ]]; then
   # prepare rRNA index for human
   # prepare smallRNA index for human
   # prepare genome index for human
   echo ${species} > ${logfile}
-elif [ "$species" = "mouse" ]; then
+elif [[ "$species" == "mouse" ]]; then
   # prepare rRNA index for mosue
   # prepare smallRNA index for mosue
   # prepare genome index for mosue
