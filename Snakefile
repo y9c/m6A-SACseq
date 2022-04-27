@@ -40,7 +40,8 @@ for g, v in config["samples"].items():
                 sample2run[s].append(s + f"-run{i}")
                 run2file[s + f"-run{i}"] = r
                 read_ids |= set(r.keys())
-
+# make sure R1 and R2 are in the correct order
+read_ids = sorted(list(read_ids))
 
 rule all:
     input:
@@ -727,8 +728,8 @@ rule blastn_to_bam:
         mem="8G",
     shell:
         """
-        {params.path_blast2bam} {input.xml} {ref_fa} {input.fq} | \
-            samtools calmd -@ {threads} --input-fmt-option 'filter=pos < 10 && pos + qlen > 33 && !flag.unmap' --output-fmt BAM - {ref_fa} 2>/dev/null > {output}
+        {params.path_blast2bam} {input.xml} {params.ref_fa} {input.fq} | \
+            samtools calmd -@ {threads} --input-fmt-option 'filter=pos < 10 && pos + qlen > 33 && !flag.unmap' --output-fmt BAM - {params.ref_fa} 2>/dev/null > {output}
         """
 
 
