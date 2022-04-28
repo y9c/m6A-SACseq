@@ -938,7 +938,7 @@ rule count_bases_by_group_splited:
     # m6a lib is reverse
     shell:
         """
-        
+        (
           {params.path_samtools} mpileup --input-fmt-option 'filter=(flag & 99 == 99 || flag & 147 == 147)' -d 0 -Q 10 --reverse-del -f {params.ref} -l {input.bedT} {input.bam} | {params.path_cpup} -H -S -f mut:2 | sed 's/\\t/\\t-\\t/3'
           {params.path_samtools} mpileup --input-fmt-option 'filter=(flag & 83 == 83 || flag & 163 == 163)' -d 0 -Q 10 --reverse-del -f {params.ref} -l {input.bedA} {input.bam} | {params.path_cpup} -H -S -f mut:2 | sed 's/\\t/\\t+\\t/3'
         ) >{output}
