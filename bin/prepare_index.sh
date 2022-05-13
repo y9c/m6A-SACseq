@@ -17,6 +17,22 @@ else
   downloader="wget -q -O"
 fi
 
+# TODO: let docker to do this, since user might not hve STAR, bowtie2 installed
+if ! command -v makeblastdb >/dev/null 2>&1; then
+  echo "BLAST (makeblastdb) shold be installed"
+  exit 1
+fi
+
+if ! command -v bowtie2-build >/dev/null 2>&1; then
+  echo "bowtie2 (bowtie2-build) shold be installed"
+  exit 1
+fi
+
+if ! command -v STAR >/dev/null 2>&1; then
+  echo "STAR shold be installed"
+  exit 1
+fi
+
 usage_error() {
   echo >&2 "$(basename $0):  $1"
   exit 2
@@ -34,7 +50,7 @@ if [ "$#" != 0 ]; then
 
     # Your options go here.
     -q | --quite) quite='true' ;;
-    -s | --threads)
+    -t | --threads)
       assert_argument "$1" "$opt"
       threads="$1"
       shift
@@ -132,6 +148,7 @@ echo "$(date -u)  Preparing contamination index..."
 download_db "${dbpath}/contamination.fa.gz" ${outdir}/contamination.fa
 bowtie2-build --threads {threads} ${outdir}/contamination.fa ${outdir}/contamination 1>>${logfile} 2>>${logfile}
 
+
 # prepare rRNA/ smallRNA/ genome index (base on different species)
 if [ "$species" = "human" ]; then
   species_prefix="Homo_sapiens.GRCh38"
@@ -161,10 +178,18 @@ bowtie2-build --threads {threads} ${outdir}/smallRNA_${species}.fa ${outdir}/sma
 echo "$(date -u)  Preparing genomne (${species}) index..."
 download_db ${url_gtf} ${outdir}/genome_${species}.gtf
 download_db ${url_fa} ${outdir}/genome_${species}.fa
-# collpase gtf
-#### python3 collapse_annotation.py gencode.v26.GRCh38.annotation.gtf gencode.v26.GRCh38.genes.gtf
+# collpase gtf (TODO: check if python packages are installed)
+wget -qO ${outdir}/collapse_annotation.py https://raw.githubusercontent.com/broadinstitute/gtex-pipeline/master/gene_model/collapse_annotation.py 1>>${logfile} 2>>${logfile}
+python3 ${outdir}/collapse_annotation.py ${outdir}/genome_${species}.collapse.gtf ${outdir}/genome_${species}.gtf 1>>${logfile} 2>>${logfile}
+rm "${outdir}/collapse_annotation.py"
 # build star index
-#### STAR (TODO: let docker to do this, since user might not hve STAR installed)
+mkdir -p ${outdir}/genome_${species}
+STAR --runThreadN ${threads} \
+  --runMode genomeGenerate \
+  --limitGenomeGenerateRAM=55000000000 \
+  --genomeDir ${outdir}/genome_${species} \
+  --sjdbGTFfile ${outdir}/genome_${species}.gtf \
+  --genomeFastaFiles ${outdir}/genome_${species}.fa 1>>${logfile} 2>>${logfile}
 
 echo "\nCOPY THE CONFIGURE BELLOW"
 echo "         ↓ ↓ ↓         \n"
@@ -189,6 +214,6 @@ echo "  genome:"
 echo "    fa: ${outdir}/genome_${species}.fa"
 echo "    fai: ${outdir}/genome_${species}"
 echo "    gtf: ${outdir}/genome_${species}.gtf"
-echo "    gtf_collapse: ${outdir}/genome_collapse_${species}.gtf"
+echo "    gtf_collapse: ${outdir}/genome_${species}.collapse.gtf"
 echo "    star: ${outdir}/genome_${species}"
 echo '\033[0m'
