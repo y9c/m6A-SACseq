@@ -185,6 +185,7 @@ rm "${outdir}/collapse_annotation.py"
 # build star index
 mkdir -p ${outdir}/genome_${species}
 STAR --runThreadN ${threads} \
+  --outTmpDir ${outdir}/genome_${species}_STARtmp \
   --runMode genomeGenerate \
   --limitGenomeGenerateRAM=55000000000 \
   --genomeDir ${outdir}/genome_${species} \
