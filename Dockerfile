@@ -24,8 +24,6 @@ RUN git clone https://github.com/Daniel-Liu-c0deb0t/UMICollapse.git /opt/UMIColl
 RUN git clone https://github.com/y9c/cpup.git /opt/cpup && make -C /opt/cpup/ -j
 RUN rm -rf /var/lib/apt/lists/* && apt-get purge -y wget git make cmake xsltproc gcc g++ pkg-config && apt-get clean
 
-RUN mkdir -p /data
-WORKDIR /data
 ADD ./bin /opt/pipeline/bin
 COPY ./Snakefile /opt/pipeline/Snakefile
 COPY ./config.yaml /opt/pipeline/config.yaml
