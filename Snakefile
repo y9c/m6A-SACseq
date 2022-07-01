@@ -28,10 +28,12 @@ group_ids = []
 run_ids = []
 sample2run = defaultdict(list)
 read_ids = set()
+# group: eg, WT, KD
 for g, v in config["samples"].items():
     group_ids.append(g)
-    for l in ["input", "treated"]:
-        for r, files in v[l].items():
+    # lib: input, treated
+    for l, v2 in v.items():
+        for r, files in v2.items():
             s = "-".join([g, l, r])
             sample_ids.append(s)
             group2sample[g].append(s)
