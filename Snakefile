@@ -220,7 +220,7 @@ rule map_to_contamination_by_bowtie2:
     shell:
         # The condition is not that stringent
         """
-        {params.path_bowtie2} -p {threads} --no-unal --end-to-end --fast --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2>&1 1>/dev/null | tee {output.report}
+        {params.path_bowtie2} -p {threads} --no-unal --end-to-end --fast --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} 1>{output.sam} 2>&1 | tee {output.report}
         """
 
 
@@ -245,7 +245,7 @@ rule map_to_spike_by_bowtie2:
         mem="96G",
     shell:
         """
-        {params.path_bowtie2} -p {threads} --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2>&1 1>/dev/null | tee {output.report}
+        {params.path_bowtie2} -p {threads} --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} 1>{output.sam} 2>&1 | tee {output.report}
         """
 
 
@@ -270,7 +270,7 @@ rule map_to_rRNA_by_bowtie2:
         mem="96G",
     shell:
         """
-        {params.path_bowtie2} -p {threads} --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2>&1 1>/dev/null | tee {output.report}
+        {params.path_bowtie2} -p {threads} --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} 1>{output.sam} 2>&1 | tee {output.report}
         """
 
 
@@ -295,7 +295,7 @@ rule map_to_smallRNA_by_bowtie2:
         mem="96G",
     shell:
         """
-        {params.path_bowtie2} -p {threads} --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2>&1 1>/dev/null | tee {output.report}
+        {params.path_bowtie2} -p {threads} --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} 1>{output.sam} 2>&1 | tee {output.report}
         """
 
 
