@@ -43,8 +43,9 @@ if [ "$#" != 0 ]; then
 
       # Your options go here.
       -q|--quite) quite='true';;
-      -j|--cores) assert_argument "$1" "$opt"; cores="$1"; shift;;
+      -j|--jobs|--cores) assert_argument "$1" "$opt"; cores="$1"; shift;;
       -c|--conf) assert_argument "$1" "$opt"; conf="$1"; shift;;
+      -p|--profile) assert_argument "$1" "$opt"; profile="$1"; shift;;
 
       # Arguments processing. You may remove any unneeded line after the 1st.
       -|''|[!-]*) set -- "$@" "$opt";;                                          # positional argument, rotate to the end
@@ -59,4 +60,4 @@ if [ "$#" != 0 ]; then
   shift  # $EOL
 fi
 
-FLASK_ENV=development snakemake -j ${cores} -q --rerun-incomplete -s /opt/pipeline/Snakefile --configfiles /opt/pipeline/config.yaml ${conf}
+FLASK_ENV=development snakemake -q --rerun-incomplete -s /opt/pipeline/Snakefile -j ${cores} --configfiles /opt/pipeline/config.yaml ${conf} --profile ${profile}
