@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 RUN echo "This is a analysis pipelie for SAC-seq data" > /README.md
 
-ENV PATH="/opt/pipeline/bin:/opt/miniconda/bin:$PATH"
+ENV PATH="/opt/pipeline/bin:/opt/miniconda/bin:/opt/slurm/bin:$PATH"
 
 # install system dependencies
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y --no-install-recommends install tzdata apt-utils wget git make cmake xsltproc gcc g++ pkg-config zlib1g-dev python3 python3-distutils default-jre
@@ -22,7 +22,10 @@ RUN git clone https://github.com/davidliwei/rnaseqmut.git /opt/rnaseqmut && mkdi
 RUN git clone https://github.com/Daniel-Liu-c0deb0t/UMICollapse.git /opt/UMICollapse && mkdir -p /opt/UMICollapse/lib && wget -P /opt/UMICollapse/lib https://repo1.maven.org/maven2/com/github/samtools/htsjdk/2.19.0/htsjdk-2.19.0.jar && wget -P /opt/UMICollapse/lib https://repo1.maven.org/maven2/org/xerial/snappy/snappy-java/1.1.7.3/snappy-java-1.1.7.3.jar
 # install cpup
 RUN git clone https://github.com/y9c/cpup.git /opt/cpup && make -C /opt/cpup/ -j
+# clean up and reduce size
 RUN rm -rf /var/lib/apt/lists/* && apt-get purge -y wget git make cmake xsltproc gcc g++ pkg-config && apt-get clean
+
+RUN mkdir -p /opt/slurm/bin && mkdir /opt/slurm/lib
 
 ADD ./bin /opt/pipeline/bin
 COPY ./Snakefile /opt/pipeline/Snakefile
