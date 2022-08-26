@@ -60,4 +60,8 @@ if [ "$#" != 0 ]; then
   shift  # $EOL
 fi
 
-FLASK_ENV=development snakemake -q --rerun-incomplete -s /opt/pipeline/Snakefile -j ${cores} --configfiles /opt/pipeline/config.yaml ${conf} --profile ${profile}
+if [ -n ${profile} ]; then
+  FLASK_ENV=development snakemake -q --rerun-incomplete -s /opt/pipeline/Snakefile -j ${cores} --configfiles /opt/pipeline/config.yaml ${conf} --profile ${profile}
+else
+  FLASK_ENV=development snakemake -q --rerun-incomplete -s /opt/pipeline/Snakefile -j ${cores} --configfiles /opt/pipeline/config.yaml ${conf}
+fi
