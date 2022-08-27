@@ -220,7 +220,7 @@ rule map_to_contamination_by_bowtie2:
     shell:
         # The condition is not that stringent
         """
-        export LC_ALL=en_US.UTF-8
+        export LC_ALL="C"
         {params.path_bowtie2} -p {threads} --no-unal --end-to-end --fast --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2> >(tee {output.report} >&2)
         """
 
@@ -246,7 +246,7 @@ rule map_to_spike_by_bowtie2:
         mem="96G",
     shell:
         """
-        export LC_ALL=en_US.UTF-8
+        export LC_ALL="C"
         {params.path_bowtie2} -p {threads} --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2> >(tee {output.report} >&2)
         """
 
@@ -272,7 +272,7 @@ rule map_to_rRNA_by_bowtie2:
         mem="96G",
     shell:
         """
-        export LC_ALL=en_US.UTF-8
+        export LC_ALL="C"
         {params.path_bowtie2} -p {threads} --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2> >(tee {output.report} >&2)
         """
 
@@ -298,7 +298,7 @@ rule map_to_smallRNA_by_bowtie2:
         mem="96G",
     shell:
         """
-        export LC_ALL=en_US.UTF-8
+        export LC_ALL="C"
         {params.path_bowtie2} -p {threads} --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2> >(tee {output.report} >&2)
         """
 
