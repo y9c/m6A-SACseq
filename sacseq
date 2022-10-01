@@ -68,11 +68,16 @@ echo "PANOPTES_PID=$PANOPTES_PID"
 trap 'kill -s SIGKILL $PANOPTES_PID' EXIT
 while true; do
   if curl -s http://127.0.0.1:5000/api/service-info | grep -q running; then
+    echo -e "\033[0;32mPLEASE MONITOR THE PIPELINE AT\033[0m http://127.0.0.1:5000"
+    echo -e "\033[0;32mIf you are running this pipeline on a remote server, \033[0m"
+    echo -e "\033[0;32mreplace the IP adress with server IP, or set ssh proxy on you local machine.\033[0m"
+    LOGFILE="SACSEQ_LOG_$(date +"%F-%H%M%S").txt"
     if [[ -n ${profile} ]]; then
-      snakemake --wms-monitor http://127.0.0.1:5000 -p --rerun-incomplete -s ${snake} -j ${cores} --configfiles /opt/pipeline/config.yaml ${conf} --profile ${profile}
+      PROFILE_SETTING="--profile ${profile}"
     else
-      snakemake --wms-monitor http://127.0.0.1:5000 -p --rerun-incomplete -s ${snake} -j ${cores} --configfiles /opt/pipeline/config.yaml ${conf}
+      PROFILE_SETTING=""
     fi
+    snakemake --wms-monitor http://127.0.0.1:5000 -p --rerun-incomplete -s ${snake} -j ${cores} --configfiles /opt/pipeline/config.yaml ${conf} ${PROFILE_SETTING} 1>${LOGFILE} 2>${LOGFILE}
     rm .panoptes.db
     kill -s SIGKILL $PANOPTES_PID
     break

@@ -1,5 +1,4 @@
-test/rawdata
-test/workspace
-test/ref
+/test/*
+!/test/data.yaml
 .panoptes.db
 .snakemake
