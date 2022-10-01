@@ -1,24 +1,32 @@
 import sys
 from collections import defaultdict
 
-workdir: config["workdir"]
 
-bed_number = config["bed_number"]
+configfile: "config.yaml"
+
+
+workdir: "workspace_demo_v2"
+
+
+# config["workdir"]
+
+
 src_dir = config["srcdir"]
 
-data_dir = os.path.dirname(workflow.overwrite_configfiles[-1])
+tmp_dir = "/scratch/midway3/yec"
+
+data_dir = os.path.dirname(workflow.configfiles[-1])
 ref_dir = data_dir
 
-if "samples" not in config:
+if "samples_Treg" not in config:
     sys.exit("`samples` is not defined in config file!")
 
-if "references" not in config:
+if "ref_GRCm39" not in config:
     sys.exit("`references` is not defined in config file!")
 
-REF = config["references"]
+REF = config["ref_GRCm39"]
 # print(workflow.basedir)
-
-
+REFTYPES = ["contamination", "spike", "sncRNA"]
 
 
 group2sample = defaultdict(list)
@@ -29,7 +37,7 @@ run_ids = []
 sample2run = defaultdict(list)
 read_ids = set()
 # group: eg, WT, KD
-for g, v in config["samples"].items():
+for g, v in config["samples_Treg"].items():
     group_ids.append(g)
     # lib: input, treated
     for l, v2 in v.items():
@@ -40,10 +48,13 @@ for g, v in config["samples"].items():
             for i, r in enumerate(files, 1):
                 run_ids.append(s + f"-run{i}")
                 sample2run[s].append(s + f"-run{i}")
-                run2file[s + f"-run{i}"] = r
+                run2file[s + f"-run{i}"] = {
+                    x: os.path.expanduser(y) for x, y in r.items()
+                }
                 read_ids |= set(r.keys())
 # make sure R1 and R2 are in the correct order
 read_ids = sorted(list(read_ids))
+
 
 rule all:
     input:
@@ -59,18 +70,17 @@ rule all:
         expand("stat_mapping/{sample}.tsv", sample=sample_ids),
         expand("stat_dedup/{sample}.tsv", sample=sample_ids),
         expand("spike_aligned/{sample}.tsv.gz", sample=sample_ids),
+        "count_reads/genome_single.count",
         expand(
             "count_depth_by_sample/{sample}_{reftype}.tsv.gz",
             sample=sample_ids,
             reftype=["genome"],
         ),
-        "count_reads/genome_single.count",
         expand(
             "pileup_filtered_by_group/{group}_{reftype}.tsv.gz",
             group=group_ids,
-            reftype=["genome"],
+            reftype=["sncRNA", "genome"],
         ),
-        # reftype=["rRNA", "smallRNA", "genome"],
 
 
 ## CHANGE: do not combine runs before mapping, so we do not need to re-run the mapping when add new runs
@@ -247,59 +257,33 @@ rule map_to_spike_by_bowtie2:
     shell:
         """
         export LC_ALL="C"
-        {params.path_bowtie2} -p {threads} --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2> >(tee {output.report} >&2)
+        {params.path_bowtie2} -p {threads} --nofw --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2> >(tee {output.report} >&2)
         """
 
 
-## Mapping: 3, rRNA
+## Mapping: 3, rRNA + tRNA + snRNA, etc.
 
 
-rule map_to_rRNA_by_bowtie2:
+rule map_to_sncRNA_by_bowtie2:
     input:
         r1="bowtie2_mapping/{rn}_spike.1.fq",
         r2="bowtie2_mapping/{rn}_spike.2.fq",
     output:
-        sam=temp("bowtie2_mapping/{rn}_rRNA.sam"),
-        un1=temp("bowtie2_mapping/{rn}_rRNA.1.fq"),
-        un2=temp("bowtie2_mapping/{rn}_rRNA.2.fq"),
-        report="bowtie2_mapping/{rn}_rRNA.report",
+        sam=temp("bowtie2_mapping/{rn}_sncRNA.sam"),
+        un1=temp("bowtie2_mapping/{rn}_sncRNA.1.fq"),
+        un2=temp("bowtie2_mapping/{rn}_sncRNA.2.fq"),
+        report="bowtie2_mapping/{rn}_sncRNA.report",
     params:
         path_bowtie2=config["path"]["bowtie2"],
-        ref_bowtie2=lambda wildcards: os.path.join(ref_dir, REF["rRNA"]["bt2"]),
-        un="bowtie2_mapping/{rn}_rRNA.fq",
+        ref_bowtie2=lambda wildcards: os.path.join(ref_dir, REF["sncRNA"]["bt2"]),
+        un="bowtie2_mapping/{rn}_sncRNA.fq",
     threads: 24
     resources:
         mem="96G",
     shell:
         """
         export LC_ALL="C"
-        {params.path_bowtie2} -p {threads} --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2> >(tee {output.report} >&2)
-        """
-
-
-## Mapping: 4, smallRNA
-
-
-rule map_to_smallRNA_by_bowtie2:
-    input:
-        r1="bowtie2_mapping/{rn}_rRNA.1.fq",
-        r2="bowtie2_mapping/{rn}_rRNA.2.fq",
-    output:
-        sam=temp("bowtie2_mapping/{rn}_smallRNA.sam"),
-        un1=temp("bowtie2_mapping/{rn}_smallRNA.1.fq"),
-        un2=temp("bowtie2_mapping/{rn}_smallRNA.2.fq"),
-        report="bowtie2_mapping/{rn}_smallRNA.report",
-    params:
-        path_bowtie2=config["path"]["bowtie2"],
-        ref_bowtie2=lambda wildcards: os.path.join(ref_dir, REF["smallRNA"]["bt2"]),
-        un="bowtie2_mapping/{rn}_smallRNA.fq",
-    threads: 24
-    resources:
-        mem="96G",
-    shell:
-        """
-        export LC_ALL="C"
-        {params.path_bowtie2} -p {threads} --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2> >(tee {output.report} >&2)
+        {params.path_bowtie2} -p {threads} --nofw --all --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2> >(tee {output.report} >&2)
         """
 
 
@@ -312,7 +296,7 @@ rule sort_and_filter_bam_bowtie2:
     output:
         "run_mapping/{rn}_{reftype}.bam",
     wildcard_constraints:
-        reftype="contamination|spike|rRNA|smallRNA",
+        reftype="contamination|spike|sncRNA",
     params:
         path_samtools=config["path"]["samtools"],
     threads: 8
@@ -329,8 +313,8 @@ rule sort_and_filter_bam_bowtie2:
 
 rule map_to_genome_by_star:
     input:
-        "bowtie2_mapping/{rn}_smallRNA.1.fq",
-        "bowtie2_mapping/{rn}_smallRNA.2.fq",
+        "bowtie2_mapping/{rn}_sncRNA.1.fq",
+        "bowtie2_mapping/{rn}_sncRNA.2.fq",
     output:
         bam="run_mapping/{rn}_genome.bam",
         log="star_mapping/{rn}_genome_Log.final.out",
@@ -491,7 +475,7 @@ rule stat_mapping:
     input:
         bam=lambda wildcards: [
             f"combined_mapping/{wildcards.sample}_{reftype}.bam"
-            for reftype in ["contamination", "spike", "rRNA", "smallRNA"]
+            for reftype in REFTYPES
         ]
         + [
             f"separate_genome_combined/{wildcards.sample}_{reftype_maptype}.bam"
@@ -501,11 +485,8 @@ rule stat_mapping:
         tsv="stat_mapping/{sample}.tsv",
     params:
         path_samtools=config["path"]["samtools"],
-        ref=[
-            "contamination",
-            "spike",
-            "rRNA",
-            "smallRNA",
+        ref=REFTYPES
+        + [
             "genome_unique",
             "genome_multi",
         ],
@@ -539,7 +520,8 @@ rule drop_duplicates:
         mem="64G",
     shell:
         """
-        java -server -Xms4G -Xmx64G -Xss100M -jar {params.path_umicollapse} bam \
+        export TMPDIR={tmp_dir}
+        java -server -Xms4G -Xmx64G -Xss100M -Djava.io.tmpdir={tmp_dir} -jar {params.path_umicollapse} bam \
             --two-pass -i {input.bam} -o {output.bam}  >{output.log}
         """
 
@@ -578,8 +560,7 @@ rule separate_genome_dedup:
 rule stat_dedup:
     input:
         bam=lambda wildcards: [
-            f"drop_duplicates/{wildcards.sample}_{reftype}.bam"
-            for reftype in ["contamination", "spike", "rRNA", "smallRNA"]
+            f"drop_duplicates/{wildcards.sample}_{reftype}.bam" for reftype in REFTYPES
         ]
         + [
             f"separate_dedup/{wildcards.sample}_{reftype_maptype}.bam"
@@ -589,11 +570,8 @@ rule stat_dedup:
         tsv="stat_dedup/{sample}.tsv",
     params:
         path_samtools=config["path"]["samtools"],
-        ref=[
-            "contamination",
-            "spike",
-            "rRNA",
-            "smallRNA",
+        ref=REFTYPES
+        + [
             "genome_unique",
             "genome_multi",
         ],
@@ -622,6 +600,7 @@ rule rnaseq_qc:
         outdir="rnaseq_qc",
     shell:
         """
+        module load boost/1.75.0  gcc
         {params.path_rnaseqc} {params.gtf} {input} {params.outdir} -s {wildcards.sample} --coverage -v
         """
 
@@ -710,7 +689,7 @@ rule map_to_spikin_by_blastn:
     output:
         temp("spike_aligned/{sample}.xml"),
     params:
-        ref_blast=os.path.join(ref_dir, REF["spikeN"]["blast"])
+        ref_blast=os.path.join(ref_dir, REF["spikeN"]["blast"]),
     threads: 24
     resources:
         mem="48G",
@@ -728,7 +707,7 @@ rule blastn_to_bam:
         temp("spike_aligned_tmp/{sample}.unsort.bam"),
     params:
         path_blast2bam=config["path"]["blast2bam"],
-        ref_fa=os.path.join(ref_dir, REF["spikeN"]["fa"])
+        ref_fa=os.path.join(ref_dir, REF["spikeN"]["fa"]),
     threads: 2
     resources:
         mem="8G",
@@ -798,13 +777,13 @@ rule count_genome_multiple:
 ## call mutation
 ## (call mutation by sample gruop, too many samples)
 
+
 ## calcuate sequence coverage of all A bases on RNA
 
 
 rule get_covered_positions_by_group:
     input:
-        bam="drop_duplicates/{sample}_{reftype}.bam",
-        bai="drop_duplicates/{sample}_{reftype}.bam.bai",
+        "drop_duplicates/{sample}_{reftype}.bam",
     output:
         "count_depth_by_sample/{sample}_{reftype}.tsv.gz",
     params:
@@ -818,175 +797,96 @@ rule get_covered_positions_by_group:
     shell:
         """
         (
-          {params.path_samtools} mpileup --input-fmt-option 'filter=(flag & 99 == 99 || flag & 147 == 147)' --no-output-del --no-output-ins --no-output-ends -d 0 -Q 10 -f {params.ref} {input.bam} | awk '$3 == "T" || $3 == "t"' | sed 's/\\t/\\t-\\t/3'
-          {params.path_samtools} mpileup --input-fmt-option 'filter=(flag & 83 == 83 || flag & 163 == 163)' --no-output-del --no-output-ins --no-output-ends -d 0 -Q 10 -f {params.ref} {input.bam} | awk '$3 == "A" || $3 == "a"' | sed 's/\\t/\\t+\\t/3'
+          {params.path_samtools} mpileup --input-fmt-option 'filter=(flag & 99 == 99 || flag & 147 == 147)' --no-output-del --no-output-ins --no-output-ends -d 0 -Q 10 -f {params.ref} {input} | awk '$3 == "T" || $3 == "t"' | sed 's/\\t/\\t-\\t/3'
+          {params.path_samtools} mpileup --input-fmt-option 'filter=(flag & 83 == 83 || flag & 163 == 163)' --no-output-del --no-output-ins --no-output-ends -d 0 -Q 10 -f {params.ref} {input} | awk '$3 == "A" || $3 == "a"' | sed 's/\\t/\\t+\\t/3'
         ) | cut -f 1-5 |  bgzip -@ {threads} -l 9 >{output}
         """
 
 
-## prefilter position by RNAseqmut
+############
+
+## prefilter position by merge all treated samples
 
 
-rule get_mutation_positions_by_group:
-    input:
-        bam="drop_duplicates/{sample}_{reftype}.bam",
-        bai="drop_duplicates/{sample}_{reftype}.bam.bai",
-    output:
-        temp("filter_positions_sep/{sample}_{reftype}.bed"),
-    params:
-        path_bedtools=config["path"]["bedtools"],
-        path_rnaseqmut=config["path"]["rnaseqmut"],
-        ref=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
-        max_mismatch=5,
-        # report_indel=" -d ",
-        report_indel="",
-    threads: 1
-    resources:
-        mem="4G",
-    shell:
-        ## rnaseqmut report format:
-        ## chr1    4776457 A       C       135     56      1       0
-        ## This mutation occurs at chr1:4776457, and it is A to C mutation. The next 4 numbers are 
-        ## the number of reference reads (forward), reference reads (backward), alternative reads (forward) and alternative reads (backward).
-        ##
-        ## IMPORTANT: rnaseqmut can not deal with overlap paired end reads correctly, so, just prefilter only...
-        ## IMPORTANT: rnaseqmut can not infer refbase correctly, reference fasta is required...
-        ## max mismatch == 5
-        ## at lease one mut event
-        ## The output file in the rule has 5 fields: chr, start, end, ref, mut_num, depth_num.
-        """
-        {params.path_rnaseqmut} -s {params.max_mismatch} -m 0 -i 1 -k {params.report_indel} -r {params.ref} {input.bam} | awk 'BEGIN{{FS="\\t";OFS="\\t"}}($3=="A" || $3 == "T"){{print $1,$2-1,$2,$3,$7+$8,$5+$6+$7+$8}}' | {params.path_bedtools} groupby -g 1,2,3,4 -c 5,6 -o sum,sum > {output}
-        """
-
-
-rule combine_positions_by_group:
+rule merge_mutated_treated_bam:
     input:
         lambda wildcards: [
-            f"filter_positions_sep/{sample}_{wildcards.reftype}.bed"
+            f"drop_duplicates/{sample}_{wildcards.reftype}.bam"
             for sample in group2sample[wildcards.group]
             if "treat" in sample
         ],
     output:
-        temp("filter_positions_by_group/{group}_{reftype}_A.site"),
-        temp("filter_positions_by_group/{group}_{reftype}_T.site"),
-    params:
-        path_bedtools=config["path"]["bedtools"],
-        out_prefix="filter_positions_by_group/{group}_{reftype}_",
-    shell:
-        ## The input file in the rule has 5 fields: chr, start, end, ref, mut_num, depth_num.
-        ## sum mut >= 2
-        ## max depth >= 5
-        """
-        cat {input} | sort -k1,1 -k2,2n | {params.path_bedtools} groupby -i - -g 1,2,3,4 -c 5,6 -o sum,max | awk '$5>=2 && $6 >=5 {{print $1"\\t"$2"\\t"$3 > "{params.out_prefix}"$4".site"}}'
-        """
-
-
-rule merge_position_into_region_by_group:
-    input:
-        "filter_positions_by_group/{group}_{reftype}_{refbase}.site",
-    output:
-        "filter_positions_by_group/{group}_{reftype}_{refbase}.bed",
-    params:
-        path_bedtools=config["path"]["bedtools"],
-    shell:
-        # bedtools merge -d 50 -i {input} | bedtools makewindows -b - -w 50 | 
-        """
-        {params.path_bedtools} merge -i {input} > {output}
-        """
-
-
-## For genome, which is too large. Split it !!!
-
-
-rule prepare_splitted_bed:
-    input:
-        "filter_positions_by_group/{group}_{reftype}_{refbase}.bed",
-    output:
-        [
-            temp(
-                f"filter_positions_by_group_split/{{group}}_{{reftype}}_{{refbase}}.{bed_index:05}.bed"
-            )
-            for bed_index in range(1, 1 + bed_number)
-        ],
-    params:
-        pre="filter_positions_by_group_split/{group}_{reftype}_{refbase}",
-        path_bedtools=config["path"]["bedtools"],
-    threads: 2
-    resources:
-        mem="8G",
-    shell:
-        """
-        {params.path_bedtools} split -i {input} -n {bed_number} -p {params.pre} -a size
-        """
-
-
-rule count_bases_by_group_splited:
-    input:
-        bam=lambda wildcards: [
-            f"drop_duplicates/{sample}_{wildcards.reftype}.bam"
-            for sample in group2sample[wildcards.group]
-        ],
-        bai=lambda wildcards: [
-            f"drop_duplicates/{sample}_{wildcards.reftype}.bam.bai"
-            for sample in group2sample[wildcards.group]
-        ],
-        bedA="filter_positions_by_group_split/{group}_{reftype}_A.{bed_index}.bed",
-        bedT="filter_positions_by_group_split/{group}_{reftype}_T.{bed_index}.bed",
-    output:
-        temp("pileup_bases_by_group_split/{group}_{reftype}_{bed_index}.tsv"),
+        bam=temp("merged_mutated_reads_by_group/{group}_{reftype}.bam"),
+        bai=temp("merged_mutated_reads_by_group/{group}_{reftype}.bam.bai"),
     params:
         path_samtools=config["path"]["samtools"],
-        path_cpup=config["path"]["cpup"],
-        ref=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
-    threads: 2
+    threads: 16
     resources:
-        mem="16G",
-    # m6a lib is reverse
+        mem="64G",
+    shell:
+        "{params.path_samtools} merge --input-fmt-option 'filter=[NM]>0' -@ {threads} -o {output.bam}##idx##{output.bai} {input}"
+
+
+rule prefilter_positions_by_group:
+    input:
+        "merged_mutated_reads_by_group/{group}_{reftype}.bam",
+    output:
+        "filter_positions_by_group/{group}_{reftype}_{refbase}.bed",
+    params:
+        ref=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
+        flag=lambda wildcards: "83 163" if wildcards.refbase == "A" else "99 147",
+        strand=lambda wildcards: "+" if wildcards.refbase == "A" else "-",
+        path_caller=config["path"]["sacseq_caller"],
+    threads: 24
+    resources:
+        mem="86G",
     shell:
         """
-        (
-          {params.path_samtools} mpileup --input-fmt-option 'filter=(flag & 99 == 99 || flag & 147 == 147)' -d 0 -Q 10 --reverse-del -f {params.ref} -l {input.bedT} {input.bam} 2>/dev/null | {params.path_cpup} -H -S -f mut:2 | sed 's/\\t/\\t-\\t/3'
-          {params.path_samtools} mpileup --input-fmt-option 'filter=(flag & 83 == 83 || flag & 163 == 163)' -d 0 -Q 10 --reverse-del -f {params.ref} -l {input.bedA} {input.bam} 2>/dev/null | {params.path_cpup} -H -S -f mut:2 | sed 's/\\t/\\t+\\t/3'
-        ) >{output}
+        {params.path_caller} -i {input} -r {params.ref} -b {wildcards.refbase} -f {params.flag} -d 3 -m 1 -F 3584 | \
+            awk 'BEGIN{{OFS="\\t"}}{{print $1,$2-1,$2,$4"/"$5,$4/$5,"{wildcards.strand}"}}' >{output}
         """
 
 
-rule count_bases_combine:
+## Count with in prefilter positions
+
+
+rule count_site_by_sample:
     input:
-        lambda wildcards: [
-            f"pileup_bases_by_group_split/{wildcards.group}_{wildcards.reftype}_{bed_index:05}.tsv"
-            for bed_index in range(1, 1 + bed_number)
-        ],
+        bam="drop_duplicates/{sample}_{reftype}.bam",
+        bai="drop_duplicates/{sample}_{reftype}.bam.bai",
+        bed="filter_positions_by_group/{group}_{reftype}_{refbase}.bed",
     output:
-        "pileup_bases_by_group/{group}_{reftype}.tsv.gz",
+        temp("pileup_bases_by_sample/{group}_{sample}_{reftype}_{refbase}.tsv"),
     params:
-        header=lambda wildcards: "\t".join(
-            ["chr", "pos", "ref_base", "strand"] + group2sample[wildcards.group]
-        ),
+        ref=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
+        flag=lambda wildcards: "83 163" if wildcards.refbase == "A" else "99 147",
+        path_caller=config["path"]["sacseq_caller"],
     threads: 8
     resources:
-        mem="42G",
+        mem="32G",
     shell:
         """
-        (
-            echo {params.header:q}
-            cat {input} | sort -S 40G -k1,1 -k2,2n
-        ) | bgzip -@ {threads} -l 9 > {output}
+        {params.path_caller} -i {input.bam} -s {input.bed} -r {params.ref} -b {wildcards.refbase} -f {params.flag} -d 0 -m 0 -F 3584 >{output}
         """
 
 
-rule calculate_sites:
+rule join_sites_by_group:
     input:
-        "pileup_bases_by_group/{group}_{reftype}.tsv.gz",
+        lambda wildcards: expand(
+            "pileup_bases_by_sample/{{group}}_{sample}_{{reftype}}_{refbase}.tsv",
+            refbase=["A", "T"],
+            sample=group2sample[wildcards.group],
+        ),
     output:
         "pileup_calculate_by_group/{group}_{reftype}.tsv.gz",
+    params:
+        sample=lambda wildcards: group2sample[wildcards.group],
+        py=os.path.join(src_dir, "join_samples_sites.py"),
     resources:
         mem="12G",
-    params:
-        py=os.path.join(src_dir, "calculate_sites.py"),
     shell:
         """
-        {params.py} {input} {output}
+        {params.py} -f {input} -n {params.sample} {params.sample} -o {output}
         """
 
 
@@ -996,7 +896,7 @@ rule filter_sites:
     output:
         "pileup_filtered_by_group/{group}_{reftype}.tsv.gz",
     params:
-        py=os.path.join(src_dir, "stat_and_filter_sites.py"),
+        py=os.path.join(src_dir, "filter_group_sites.py"),
         fa=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
     resources:
         mem="12G",
