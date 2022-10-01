@@ -5,9 +5,9 @@
 #
 # Created: 2022-04-20 22:28
 
-dbpath="https://raw.githubusercontent.com/chelab/db/main/reference_sequence"
+dbpath="https://raw.githubusercontent.com/y9c/m6A-SACseq/main/db"
 species="human"
-outdir="ref_test"
+outdir="ref"
 logfile="$outdir/indexing.log"
 threads=16
 
@@ -99,7 +99,7 @@ download_db() {
       return
     fi
   fi
-  echo "$(date -u)  Downloading db: ${outfile}..."
+  echo "$(date -u)  Downloading db: ${outfile} from ${inurl}"
   ${downloader} ${outfile}.gz ${inurl} 2>&1 >>${logfile}
   gunzip -f ${outfile}.gz 2>&1 >>${logfile}
 }
@@ -148,7 +148,6 @@ echo "$(date -u)  Preparing contamination index..."
 download_db "${dbpath}/contamination.fa.gz" ${outdir}/contamination.fa
 bowtie2-build --threads {threads} ${outdir}/contamination.fa ${outdir}/contamination 1>>${logfile} 2>>${logfile}
 
-
 # prepare rRNA/ smallRNA/ genome index (base on different species)
 if [ "$species" = "human" ]; then
   species_prefix="Homo_sapiens.GRCh38"
@@ -163,19 +162,13 @@ else
   exit 0
 fi
 
-# prepare rRNA index
-echo "$(date -u)  Preparing rRNA (${species}) index..."
-download_db "${dbpath}/${species_prefix}.rRNA.fa.gz" ${outdir}/rRNA_${species}.fa
-bowtie2-build --threads {threads} ${outdir}/rRNA_${species}.fa ${outdir}/rRNA_${species} 1>>${logfile} 2>>${logfile}
-
-# prepare smallRNA index
-echo "$(date -u)  Preparing smallRNA (${species}) index..."
-
-download_db "${dbpath}/${species_prefix}.smallRNA.fa.gz" ${outdir}/smallRNA_${species}.fa
-bowtie2-build --threads {threads} ${outdir}/smallRNA_${species}.fa ${outdir}/smallRNA_${species} 1>>${logfile} 2>>${logfile}
+# prepare sncRNA index
+echo "$(date -u)  Preparing index for rRNA + tRNA + snoRNA + snRNA + other non coding RNA (${species}) ..."
+download_db "${dbpath}/${species_prefix}.sncRNA.fa.gz" ${outdir}/rRNA_${species}.fa
+bowtie2-build --threads {threads} ${outdir}/sncRNA_${species}.fa ${outdir}/sncRNA_${species} 1>>${logfile} 2>>${logfile}
 
 # prepare genome index
-echo "$(date -u)  Preparing genomne (${species}) index..."
+echo "$(date -u)  Preparing index for genomne (${species}) ..."
 download_db ${url_gtf} ${outdir}/genome_${species}.gtf
 download_db ${url_fa} ${outdir}/genome_${species}.fa
 # collpase gtf (TODO: check if python packages are installed)
@@ -205,12 +198,9 @@ echo "    blast: ${outdir}/spike_degenerate"
 echo "  contamination:"
 echo "    fa: ${outdir}/contamination.fa"
 echo "    bt2: ${outdir}/contamination"
-echo "  rRNA:"
-echo "    fa: ${outdir}/rRNA_${species}.fa"
-echo "    bt2: ${outdir}/rRNA_${species}"
-echo "  smallRNA:"
-echo "    fa: ${outdir}/smallRNA_${species}.fa"
-echo "    bt2: ${outdir}/smallRNA_${species}"
+echo "  sncRNA:"
+echo "    fa: ${outdir}/sncRNA_${species}.fa"
+echo "    bt2: ${outdir}/sncRNA_${species}"
 echo "  genome:"
 echo "    fa: ${outdir}/genome_${species}.fa"
 echo "    fai: ${outdir}/genome_${species}"
