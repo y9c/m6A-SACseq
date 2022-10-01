@@ -836,7 +836,7 @@ rule prefilter_positions_by_group:
         ref=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
         flag=lambda wildcards: "83 163" if wildcards.refbase == "A" else "99 147",
         strand=lambda wildcards: "+" if wildcards.refbase == "A" else "-",
-        path_caller=config["path"]["sacseq_caller"],
+        path_caller=os.path.join(src_dir, "sacseq_caller"),
     threads: 24
     resources:
         mem="86G",
@@ -860,7 +860,7 @@ rule count_site_by_sample:
     params:
         ref=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
         flag=lambda wildcards: "83 163" if wildcards.refbase == "A" else "99 147",
-        path_caller=config["path"]["sacseq_caller"],
+        path_caller=os.path.join(src_dir, "sacseq_caller"),
     threads: 8
     resources:
         mem="32G",
