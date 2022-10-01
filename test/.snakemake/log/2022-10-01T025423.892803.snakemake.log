@@ -1,0 +1,32 @@
+Job stats:
+job                       count    min threads    max threads
+----------------------  -------  -------------  -------------
+all                           1              1              1
+blastn_bam_sort               1              4              4
+blastn_to_bam                 1              2              2
+call_mutation_of_spike        1              4              4
+filter_sites                  2              1              1
+join_sites_by_group           2              1              1
+total                         8              1              4
+
+[Sat Oct  1 02:54:26 2022]
+[Sat Oct  1 02:54:26 2022]
+Error in rule join_sites_by_group:
+    jobid: 250
+    output: pileup_calculate_by_group/HeLa-WT_genome.tsv.gz
+    shell:
+        
+        /opt/pipeline/bin/join_samples_sites.py -f pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_genome_A.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_genome_A.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_genome_A.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_genome_A.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_genome_T.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_genome_T.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_genome_T.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_genome_T.tsv -n HeLa-WT-input-rep1 HeLa-WT-input-rep2 HeLa-WT-treated-rep1 HeLa-WT-treated-rep2 HeLa-WT-input-rep1 HeLa-WT-input-rep2 HeLa-WT-treated-rep1 HeLa-WT-treated-rep2 -o pileup_calculate_by_group/HeLa-WT_genome.tsv.gz
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule join_sites_by_group:
+    jobid: 233
+    output: pileup_calculate_by_group/HeLa-WT_sncRNA.tsv.gz
+    shell:
+        
+        /opt/pipeline/bin/join_samples_sites.py -f pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_sncRNA_A.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_sncRNA_A.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_sncRNA_A.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_sncRNA_A.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_sncRNA_T.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_sncRNA_T.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_sncRNA_T.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_sncRNA_T.tsv -n HeLa-WT-input-rep1 HeLa-WT-input-rep2 HeLa-WT-treated-rep1 HeLa-WT-treated-rep2 HeLa-WT-input-rep1 HeLa-WT-input-rep2 HeLa-WT-treated-rep1 HeLa-WT-treated-rep2 -o pileup_calculate_by_group/HeLa-WT_sncRNA.tsv.gz
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Exiting because a job execution failed. Look above for error message

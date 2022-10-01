@@ -1,0 +1,299 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 64
+Rules claiming more threads will be scaled down.
+Job stats:
+job                             count    min threads    max threads
+----------------------------  -------  -------------  -------------
+all                                 1              1              1
+count_site_by_sample               16              8              8
+filter_sites                        2              1              1
+join_sites_by_group                 2              1              1
+merge_mutated_treated_bam           2             16             16
+prefilter_positions_by_group        4             24             24
+total                              27              1             24
+
+Select jobs to execute...
+
+[Sat Oct  1 03:22:36 2022]
+rule merge_mutated_treated_bam:
+    input: drop_duplicates/HeLa-WT-treated-rep1_sncRNA.bam, drop_duplicates/HeLa-WT-treated-rep2_sncRNA.bam
+    output: merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam, merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam.bai
+    jobid: 237
+    wildcards: group=HeLa-WT, reftype=sncRNA
+    threads: 16
+    resources: tmpdir=/tmp, mem=64G
+
+/opt/miniconda/bin/samtools merge --write-index -@ 16 --input-fmt-option 'filter=[NM]>0' -o merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam##idx##merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam.bai drop_duplicates/HeLa-WT-treated-rep1_sncRNA.bam drop_duplicates/HeLa-WT-treated-rep2_sncRNA.bam
+
+[Sat Oct  1 03:22:36 2022]
+rule merge_mutated_treated_bam:
+    input: drop_duplicates/HeLa-WT-treated-rep1_genome.bam, drop_duplicates/HeLa-WT-treated-rep2_genome.bam
+    output: merged_mutated_reads_by_group/HeLa-WT_genome.bam, merged_mutated_reads_by_group/HeLa-WT_genome.bam.bai
+    jobid: 254
+    wildcards: group=HeLa-WT, reftype=genome
+    threads: 16
+    resources: tmpdir=/tmp, mem=64G
+
+/opt/miniconda/bin/samtools merge --write-index -@ 16 --input-fmt-option 'filter=[NM]>0' -o merged_mutated_reads_by_group/HeLa-WT_genome.bam##idx##merged_mutated_reads_by_group/HeLa-WT_genome.bam.bai drop_duplicates/HeLa-WT-treated-rep1_genome.bam drop_duplicates/HeLa-WT-treated-rep2_genome.bam
+[Sat Oct  1 03:22:38 2022]
+Finished job 237.
+1 of 27 steps (4%) done
+Select jobs to execute...
+
+[Sat Oct  1 03:22:38 2022]
+rule prefilter_positions_by_group:
+    input: merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam, merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam.bai
+    output: filter_positions_by_group/HeLa-WT_sncRNA_T.bed
+    jobid: 245
+    wildcards: group=HeLa-WT, reftype=sncRNA, refbase=T
+    threads: 24
+    resources: tmpdir=/tmp, mem=86G
+
+
+        /opt/pipeline/bin/sacseq_caller -i merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa -b T -f 99 147 -d 3 -m 1 -F 3584 |             awk 'BEGIN{OFS="\t"}{print $1,$2-1,$2,$4"/"$5,$4/$5,"-"}' >filter_positions_by_group/HeLa-WT_sncRNA_T.bed
+        
+
+[Sat Oct  1 03:22:38 2022]
+rule prefilter_positions_by_group:
+    input: merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam, merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam.bai
+    output: filter_positions_by_group/HeLa-WT_sncRNA_A.bed
+    jobid: 236
+    wildcards: group=HeLa-WT, reftype=sncRNA, refbase=A
+    threads: 24
+    resources: tmpdir=/tmp, mem=86G
+
+
+        /opt/pipeline/bin/sacseq_caller -i merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa -b A -f 83 163 -d 3 -m 1 -F 3584 |             awk 'BEGIN{OFS="\t"}{print $1,$2-1,$2,$4"/"$5,$4/$5,"+"}' >filter_positions_by_group/HeLa-WT_sncRNA_A.bed
+        
+[Sat Oct  1 03:22:38 2022]
+Finished job 254.
+2 of 27 steps (7%) done
+Select jobs to execute...
+[Sat Oct  1 03:23:00 2022]
+Finished job 245.
+3 of 27 steps (11%) done
+
+[Sat Oct  1 03:23:00 2022]
+rule count_site_by_sample:
+    input: drop_duplicates/HeLa-WT-input-rep2_sncRNA.bam, drop_duplicates/HeLa-WT-input-rep2_sncRNA.bam.bai, filter_positions_by_group/HeLa-WT_sncRNA_T.bed
+    output: pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_sncRNA_T.tsv
+    jobid: 246
+    wildcards: group=HeLa-WT, sample=HeLa-WT-input-rep2, reftype=sncRNA, refbase=T
+    threads: 8
+    resources: tmpdir=/tmp, mem=32G
+
+
+        /opt/pipeline/bin/sacseq_caller -i drop_duplicates/HeLa-WT-input-rep2_sncRNA.bam -s filter_positions_by_group/HeLa-WT_sncRNA_T.bed -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa -b T -f 99 147 -d 0 -m 0 -F 3584 >pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_sncRNA_T.tsv
+        
+
+[Sat Oct  1 03:23:00 2022]
+rule prefilter_positions_by_group:
+    input: merged_mutated_reads_by_group/HeLa-WT_genome.bam, merged_mutated_reads_by_group/HeLa-WT_genome.bam.bai
+    output: filter_positions_by_group/HeLa-WT_genome_A.bed
+    jobid: 253
+    wildcards: group=HeLa-WT, reftype=genome, refbase=A
+    threads: 24
+    resources: tmpdir=/tmp, mem=86G
+
+
+        /opt/pipeline/bin/sacseq_caller -i merged_mutated_reads_by_group/HeLa-WT_genome.bam -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/genome_human.fa -b A -f 83 163 -d 3 -m 1 -F 3584 |             awk 'BEGIN{OFS="\t"}{print $1,$2-1,$2,$4"/"$5,$4/$5,"+"}' >filter_positions_by_group/HeLa-WT_genome_A.bed
+        
+
+[Sat Oct  1 03:23:00 2022]
+rule count_site_by_sample:
+    input: drop_duplicates/HeLa-WT-input-rep1_sncRNA.bam, drop_duplicates/HeLa-WT-input-rep1_sncRNA.bam.bai, filter_positions_by_group/HeLa-WT_sncRNA_T.bed
+    output: pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_sncRNA_T.tsv
+    jobid: 244
+    wildcards: group=HeLa-WT, sample=HeLa-WT-input-rep1, reftype=sncRNA, refbase=T
+    threads: 8
+    resources: tmpdir=/tmp, mem=32G
+
+
+        /opt/pipeline/bin/sacseq_caller -i drop_duplicates/HeLa-WT-input-rep1_sncRNA.bam -s filter_positions_by_group/HeLa-WT_sncRNA_T.bed -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa -b T -f 99 147 -d 0 -m 0 -F 3584 >pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_sncRNA_T.tsv
+        
+Removing temporary output file merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam.
+Removing temporary output file merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam.bai.
+[Sat Oct  1 03:23:00 2022]
+Finished job 236.
+4 of 27 steps (15%) done
+Select jobs to execute...
+
+[Sat Oct  1 03:23:00 2022]
+rule prefilter_positions_by_group:
+    input: merged_mutated_reads_by_group/HeLa-WT_genome.bam, merged_mutated_reads_by_group/HeLa-WT_genome.bam.bai
+    output: filter_positions_by_group/HeLa-WT_genome_T.bed
+    jobid: 262
+    wildcards: group=HeLa-WT, reftype=genome, refbase=T
+    threads: 24
+    resources: tmpdir=/tmp, mem=86G
+
+
+        /opt/pipeline/bin/sacseq_caller -i merged_mutated_reads_by_group/HeLa-WT_genome.bam -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/genome_human.fa -b T -f 99 147 -d 3 -m 1 -F 3584 |             awk 'BEGIN{OFS="\t"}{print $1,$2-1,$2,$4"/"$5,$4/$5,"-"}' >filter_positions_by_group/HeLa-WT_genome_T.bed
+        
+[Sat Oct  1 03:23:00 2022]
+Finished job 246.
+5 of 27 steps (19%) done
+Select jobs to execute...
+
+[Sat Oct  1 03:23:00 2022]
+rule count_site_by_sample:
+    input: drop_duplicates/HeLa-WT-input-rep1_sncRNA.bam, drop_duplicates/HeLa-WT-input-rep1_sncRNA.bam.bai, filter_positions_by_group/HeLa-WT_sncRNA_A.bed
+    output: pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_sncRNA_A.tsv
+    jobid: 234
+    wildcards: group=HeLa-WT, sample=HeLa-WT-input-rep1, reftype=sncRNA, refbase=A
+    threads: 8
+    resources: tmpdir=/tmp, mem=32G
+
+
+        /opt/pipeline/bin/sacseq_caller -i drop_duplicates/HeLa-WT-input-rep1_sncRNA.bam -s filter_positions_by_group/HeLa-WT_sncRNA_A.bed -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa -b A -f 83 163 -d 0 -m 0 -F 3584 >pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_sncRNA_A.tsv
+        
+[Sat Oct  1 03:23:00 2022]
+Finished job 244.
+6 of 27 steps (22%) done
+Select jobs to execute...
+
+[Sat Oct  1 03:23:00 2022]
+rule count_site_by_sample:
+    input: drop_duplicates/HeLa-WT-input-rep2_sncRNA.bam, drop_duplicates/HeLa-WT-input-rep2_sncRNA.bam.bai, filter_positions_by_group/HeLa-WT_sncRNA_A.bed
+    output: pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_sncRNA_A.tsv
+    jobid: 238
+    wildcards: group=HeLa-WT, sample=HeLa-WT-input-rep2, reftype=sncRNA, refbase=A
+    threads: 8
+    resources: tmpdir=/tmp, mem=32G
+
+
+        /opt/pipeline/bin/sacseq_caller -i drop_duplicates/HeLa-WT-input-rep2_sncRNA.bam -s filter_positions_by_group/HeLa-WT_sncRNA_A.bed -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa -b A -f 83 163 -d 0 -m 0 -F 3584 >pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_sncRNA_A.tsv
+        
+[Sat Oct  1 03:24:31 2022]
+Finished job 238.
+7 of 27 steps (26%) done
+Select jobs to execute...
+
+[Sat Oct  1 03:24:31 2022]
+rule count_site_by_sample:
+    input: drop_duplicates/HeLa-WT-treated-rep1_sncRNA.bam, drop_duplicates/HeLa-WT-treated-rep1_sncRNA.bam.bai, filter_positions_by_group/HeLa-WT_sncRNA_A.bed
+    output: pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_sncRNA_A.tsv
+    jobid: 240
+    wildcards: group=HeLa-WT, sample=HeLa-WT-treated-rep1, reftype=sncRNA, refbase=A
+    threads: 8
+    resources: tmpdir=/tmp, mem=32G
+
+
+        /opt/pipeline/bin/sacseq_caller -i drop_duplicates/HeLa-WT-treated-rep1_sncRNA.bam -s filter_positions_by_group/HeLa-WT_sncRNA_A.bed -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa -b A -f 83 163 -d 0 -m 0 -F 3584 >pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_sncRNA_A.tsv
+        
+[Sat Oct  1 03:24:35 2022]
+Finished job 234.
+8 of 27 steps (30%) done
+Select jobs to execute...
+
+[Sat Oct  1 03:24:35 2022]
+rule count_site_by_sample:
+    input: drop_duplicates/HeLa-WT-treated-rep2_sncRNA.bam, drop_duplicates/HeLa-WT-treated-rep2_sncRNA.bam.bai, filter_positions_by_group/HeLa-WT_sncRNA_A.bed
+    output: pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_sncRNA_A.tsv
+    jobid: 242
+    wildcards: group=HeLa-WT, sample=HeLa-WT-treated-rep2, reftype=sncRNA, refbase=A
+    threads: 8
+    resources: tmpdir=/tmp, mem=32G
+
+
+        /opt/pipeline/bin/sacseq_caller -i drop_duplicates/HeLa-WT-treated-rep2_sncRNA.bam -s filter_positions_by_group/HeLa-WT_sncRNA_A.bed -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa -b A -f 83 163 -d 0 -m 0 -F 3584 >pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_sncRNA_A.tsv
+        
+[Sat Oct  1 03:26:03 2022]
+Finished job 240.
+9 of 27 steps (33%) done
+Select jobs to execute...
+
+[Sat Oct  1 03:26:03 2022]
+rule count_site_by_sample:
+    input: drop_duplicates/HeLa-WT-treated-rep1_sncRNA.bam, drop_duplicates/HeLa-WT-treated-rep1_sncRNA.bam.bai, filter_positions_by_group/HeLa-WT_sncRNA_T.bed
+    output: pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_sncRNA_T.tsv
+    jobid: 247
+    wildcards: group=HeLa-WT, sample=HeLa-WT-treated-rep1, reftype=sncRNA, refbase=T
+    threads: 8
+    resources: tmpdir=/tmp, mem=32G
+
+
+        /opt/pipeline/bin/sacseq_caller -i drop_duplicates/HeLa-WT-treated-rep1_sncRNA.bam -s filter_positions_by_group/HeLa-WT_sncRNA_T.bed -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa -b T -f 99 147 -d 0 -m 0 -F 3584 >pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_sncRNA_T.tsv
+        
+[Sat Oct  1 03:26:03 2022]
+Finished job 247.
+10 of 27 steps (37%) done
+Select jobs to execute...
+
+[Sat Oct  1 03:26:03 2022]
+rule count_site_by_sample:
+    input: drop_duplicates/HeLa-WT-treated-rep2_sncRNA.bam, drop_duplicates/HeLa-WT-treated-rep2_sncRNA.bam.bai, filter_positions_by_group/HeLa-WT_sncRNA_T.bed
+    output: pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_sncRNA_T.tsv
+    jobid: 248
+    wildcards: group=HeLa-WT, sample=HeLa-WT-treated-rep2, reftype=sncRNA, refbase=T
+    threads: 8
+    resources: tmpdir=/tmp, mem=32G
+
+
+        /opt/pipeline/bin/sacseq_caller -i drop_duplicates/HeLa-WT-treated-rep2_sncRNA.bam -s filter_positions_by_group/HeLa-WT_sncRNA_T.bed -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa -b T -f 99 147 -d 0 -m 0 -F 3584 >pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_sncRNA_T.tsv
+        
+[Sat Oct  1 03:26:04 2022]
+Finished job 248.
+11 of 27 steps (41%) done
+[Sat Oct  1 03:26:12 2022]
+Finished job 242.
+12 of 27 steps (44%) done
+Select jobs to execute...
+
+[Sat Oct  1 03:26:12 2022]
+rule join_sites_by_group:
+    input: pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_sncRNA_A.tsv, pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_sncRNA_A.tsv, pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_sncRNA_A.tsv, pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_sncRNA_A.tsv, pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_sncRNA_T.tsv, pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_sncRNA_T.tsv, pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_sncRNA_T.tsv, pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_sncRNA_T.tsv
+    output: pileup_calculate_by_group/HeLa-WT_sncRNA.tsv.gz
+    jobid: 233
+    wildcards: group=HeLa-WT, reftype=sncRNA
+    resources: tmpdir=/tmp, mem=12G
+
+
+        /opt/pipeline/bin/join_samples_sites.py -f pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_sncRNA_A.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_sncRNA_A.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_sncRNA_A.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_sncRNA_A.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_sncRNA_T.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_sncRNA_T.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_sncRNA_T.tsv pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_sncRNA_T.tsv -n HeLa-WT-input-rep1 HeLa-WT-input-rep2 HeLa-WT-treated-rep1 HeLa-WT-treated-rep2 HeLa-WT-input-rep1 HeLa-WT-input-rep2 HeLa-WT-treated-rep1 HeLa-WT-treated-rep2 -o pileup_calculate_by_group/HeLa-WT_sncRNA.tsv.gz
+        
+Removing temporary output file pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_sncRNA_A.tsv.
+Removing temporary output file pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_sncRNA_A.tsv.
+Removing temporary output file pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_sncRNA_A.tsv.
+Removing temporary output file pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_sncRNA_A.tsv.
+Removing temporary output file pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep1_sncRNA_T.tsv.
+Removing temporary output file pileup_bases_by_sample/HeLa-WT_HeLa-WT-input-rep2_sncRNA_T.tsv.
+Removing temporary output file pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep1_sncRNA_T.tsv.
+Removing temporary output file pileup_bases_by_sample/HeLa-WT_HeLa-WT-treated-rep2_sncRNA_T.tsv.
+[Sat Oct  1 03:26:13 2022]
+Finished job 233.
+13 of 27 steps (48%) done
+Select jobs to execute...
+
+[Sat Oct  1 03:26:13 2022]
+rule filter_sites:
+    input: pileup_calculate_by_group/HeLa-WT_sncRNA.tsv.gz
+    output: pileup_filtered_by_group/HeLa-WT_sncRNA.tsv.gz
+    jobid: 232
+    wildcards: group=HeLa-WT, reftype=sncRNA
+    resources: tmpdir=/tmp, mem=12G
+
+
+        /opt/pipeline/bin/filter_group_sites.py /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa pileup_calculate_by_group/HeLa-WT_sncRNA.tsv.gz pileup_filtered_by_group/HeLa-WT_sncRNA.tsv.gz
+        
+[Sat Oct  1 03:26:13 2022]
+Error in rule filter_sites:
+    jobid: 232
+    output: pileup_filtered_by_group/HeLa-WT_sncRNA.tsv.gz
+    shell:
+        
+        /opt/pipeline/bin/filter_group_sites.py /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa pileup_calculate_by_group/HeLa-WT_sncRNA.tsv.gz pileup_filtered_by_group/HeLa-WT_sncRNA.tsv.gz
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Sat Oct  1 03:26:42 2022]
+Finished job 262.
+14 of 27 steps (52%) done
+Removing temporary output file merged_mutated_reads_by_group/HeLa-WT_genome.bam.
+Removing temporary output file merged_mutated_reads_by_group/HeLa-WT_genome.bam.bai.
+[Sat Oct  1 03:26:53 2022]
+Finished job 253.
+15 of 27 steps (56%) done
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/.snakemake/log/2022-10-01T032236.028904.snakemake.log

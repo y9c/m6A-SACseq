@@ -1,0 +1,56 @@
+Job stats:
+job                                count    min threads    max threads
+-------------------------------  -------  -------------  -------------
+all                                    1              1              1
+blastn_bam_sort                        4              4              4
+blastn_to_bam                          4              2              2
+call_mutation_of_spike                 4              4              4
+combine_runs                          14              4              4
+combined_unmap                         4             12             12
+compress_star_unmap                   16             12             12
+count_cutadapt_reads                   2              1              1
+count_genome_multiple                  1             32             32
+count_site_by_sample                  16              8              8
+cutadapt                               2             20             20
+dedup_bam_index                        8              4              4
+drop_duplicates                       14              8              8
+falco_after                            4              1              1
+falco_unmap                           16              1              1
+filter_sites                           2              1              1
+get_covered_positions_by_group         4              1              1
+join_sites_by_group                    2              1              1
+map_to_contamination_by_bowtie2        5             24             24
+map_to_genome_by_star                  8             24             24
+map_to_sncRNA_by_bowtie2               8             24             24
+map_to_spike_by_bowtie2                6             24             24
+map_to_spikin_by_blastn                4             24             24
+merge_map                              4             12             12
+merge_mutated_treated_bam              2             16             16
+merge_unmap                            8             12             12
+prefilter_positions_by_group           4             24             24
+report_cutadapt                        1              1              1
+report_falco_after                     1              1              1
+report_falco_unmap                     1              1              1
+report_rnaseqc                         1              1              1
+report_star                            1              1              1
+rnaseq_qc                              4              1              1
+separate_genome_combined               4              4              4
+separate_genome_dedup                  4              4              4
+sort_and_filter_bam_bowtie2           19              8              8
+spike_fasta                            4              1              1
+stat_dedup                             4              2              2
+stat_mapping                           4              2              2
+total                                215              1             32
+
+[Sat Oct  1 02:06:23 2022]
+Error in rule rnaseq_qc:
+    jobid: 111
+    output: rnaseq_qc/HeLa-WT-input-rep1.metrics.tsv
+    shell:
+        
+        module load boost/1.75.0  gcc
+        /opt/rnaseqc /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/genome_human.collapse.gtf drop_duplicates/HeLa-WT-input-rep1_genome.bam rnaseq_qc -s HeLa-WT-input-rep1 --coverage -v
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Exiting because a job execution failed. Look above for error message

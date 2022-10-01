@@ -1,0 +1,7 @@
+Building DAG of jobs...
+MissingInputException in line 89 of /home/yec/projects/m6A_SACseq/m6A-SACseq/Snakefile:
+Missing input files for rule falco_before:
+    output: quality_control/falco_before/HeLa-WT-input-rep1-run1_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-input-rep1-run1_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-input-rep1-run1_R1/summary.txt
+    wildcards: rn=HeLa-WT-input-rep1-run1, rd=R1
+    affected files:
+        /home/yec/projects/m6A_SACseq/m6A-SACseq/test/../rawdata/HeLa-WT-polyA-input-rep1-run1_R1.fq.gz

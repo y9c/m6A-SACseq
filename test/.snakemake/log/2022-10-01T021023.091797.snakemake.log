@@ -1,0 +1,55 @@
+Job stats:
+job                                count    min threads    max threads
+-------------------------------  -------  -------------  -------------
+all                                    1              1              1
+blastn_bam_sort                        3              4              4
+blastn_to_bam                          3              2              2
+call_mutation_of_spike                 3              4              4
+combine_runs                          12              4              4
+combined_unmap                         3             12             12
+compress_star_unmap                   12             12             12
+count_cutadapt_reads                   1              1              1
+count_genome_multiple                  1             32             32
+count_site_by_sample                  16              8              8
+cutadapt                               1             20             20
+dedup_bam_index                        6              4              4
+drop_duplicates                       12              8              8
+falco_after                            2              1              1
+falco_unmap                           12              1              1
+filter_sites                           2              1              1
+get_covered_positions_by_group         3              1              1
+join_sites_by_group                    2              1              1
+map_to_contamination_by_bowtie2        4             24             24
+map_to_genome_by_star                  5             24             24
+map_to_sncRNA_by_bowtie2               4             24             24
+map_to_spike_by_bowtie2                4             24             24
+map_to_spikin_by_blastn                3             24             24
+merge_map                              3             12             12
+merge_mutated_treated_bam              2             16             16
+merge_unmap                            6             12             12
+prefilter_positions_by_group           4             24             24
+report_cutadapt                        1              1              1
+report_falco_after                     1              1              1
+report_falco_unmap                     1              1              1
+report_rnaseqc                         1              1              1
+report_star                            1              1              1
+rnaseq_qc                              4              1              1
+separate_genome_combined               3              4              4
+separate_genome_dedup                  3              4              4
+sort_and_filter_bam_bowtie2           13              8              8
+spike_fasta                            3              1              1
+stat_dedup                             4              2              2
+stat_mapping                           3              2              2
+total                                168              1             32
+
+MissingOutputException in line 807 of /opt/pipeline/Snakefile:
+Job Missing files after 5 seconds:
+merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam.bai
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 237 completed successfully, but some output files are missing. 237
+MissingOutputException in line 807 of /opt/pipeline/Snakefile:
+Job Missing files after 5 seconds:
+merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam
+merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam.bai
+This might be due to filesystem latency. If that is the case, consider to increase the wait time with --latency-wait.
+Job id: 237 completed successfully, but some output files are missing. 237

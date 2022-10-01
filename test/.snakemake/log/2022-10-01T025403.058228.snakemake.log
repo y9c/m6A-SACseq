@@ -1,0 +1,83 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 60
+Rules claiming more threads will be scaled down.
+Job stats:
+job                                count    min threads    max threads
+-------------------------------  -------  -------------  -------------
+all                                    1              1              1
+blastn_bam_sort                        1              4              4
+blastn_to_bam                          1              2              2
+call_mutation_of_spike                 1              4              4
+combine_runs                           4              4              4
+combined_unmap                         1             12             12
+compress_star_unmap                    2             12             12
+count_genome_multiple                  1             32             32
+count_site_by_sample                   4              8              8
+dedup_bam_index                        2              4              4
+drop_duplicates                        4              8              8
+falco_unmap                            2              1              1
+filter_sites                           2              1              1
+get_covered_positions_by_group         1              1              1
+join_sites_by_group                    2              1              1
+map_to_contamination_by_bowtie2        1             24             24
+map_to_genome_by_star                  1             24             24
+map_to_sncRNA_by_bowtie2               1             24             24
+map_to_spike_by_bowtie2                1             24             24
+map_to_spikin_by_blastn                1             24             24
+merge_map                              1             12             12
+merge_unmap                            2             12             12
+report_falco_unmap                     1              1              1
+report_rnaseqc                         1              1              1
+report_star                            1              1              1
+rnaseq_qc                              1              1              1
+separate_genome_combined               1              4              4
+separate_genome_dedup                  1              4              4
+sort_and_filter_bam_bowtie2            3              8              8
+spike_fasta                            1              1              1
+stat_dedup                             1              2              2
+stat_mapping                           1              2              2
+total                                 49              1             32
+
+Select jobs to execute...
+
+[Sat Oct  1 02:54:03 2022]
+rule merge_unmap:
+    input: star_mapping/HeLa-WT-input-rep1-run2_genome_Unmapped.out.mate1.fq.gz, star_mapping/HeLa-WT-input-rep1-run2_genome_Unmapped.out.mate2.fq.gz
+    output: spike_reads_by_run/unmap/HeLa-WT-input-rep1-run2.fq
+    jobid: 199
+    reason: Missing output files: spike_reads_by_run/unmap/HeLa-WT-input-rep1-run2.fq
+    wildcards: rn=HeLa-WT-input-rep1-run2
+    threads: 12
+    resources: tmpdir=/tmp, mem=36G
+
+
+[Sat Oct  1 02:54:03 2022]
+rule map_to_contamination_by_bowtie2:
+    input: cut_adapter/HeLa-WT-input-rep1-run1_cut_R1.fq.gz, cut_adapter/HeLa-WT-input-rep1-run1_cut_R2.fq.gz
+    output: bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.sam, bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.1.fq, bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.2.fq, bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.report
+    jobid: 48
+    reason: Missing output files: bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.1.fq, bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.sam, bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.2.fq
+    wildcards: rn=HeLa-WT-input-rep1-run1
+    threads: 24
+    resources: tmpdir=/tmp, mem=96G
+
+[Sat Oct  1 02:54:03 2022]
+Error in rule map_to_contamination_by_bowtie2:
+    jobid: 48
+    output: bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.sam, bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.1.fq, bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.2.fq, bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.report
+    shell:
+        
+        export LC_ALL="C"
+        /opt/miniconda/bin/bowtie2 -p 24 --no-unal --end-to-end --fast --un-conc bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.fq -x /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/contamination -1 cut_adapter/HeLa-WT-input-rep1-run1_cut_R1.fq.gz -2 cut_adapter/HeLa-WT-input-rep1-run1_cut_R2.fq.gz > bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.sam 2> >(tee bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.report >&2)
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Removing output files of failed job map_to_contamination_by_bowtie2 since they might be corrupted:
+bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.sam, bowtie2_mapping/HeLa-WT-input-rep1-run1_contamination.report
+[Sat Oct  1 02:54:04 2022]
+Finished job 199.
+1 of 49 steps (2%) done
+Shutting down, this might take some time.
+Exiting because a job execution failed. Look above for error message
+Complete log: ../.snakemake/log/2022-10-01T025403.058228.snakemake.log

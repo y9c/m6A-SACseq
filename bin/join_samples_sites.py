@@ -46,7 +46,8 @@ df = (
         values=["mut", "depth"],
     )
     .swaplevel(axis=1)
-    .loc[:, uniq_names]
+    # .loc[:, uniq_names]
+    .reindex(uniq_names, axis="columns", level=0)
     .fillna(0)
     .astype(pd.Int64Dtype())
 )

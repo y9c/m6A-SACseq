@@ -5,26 +5,21 @@ from collections import defaultdict
 configfile: "config.yaml"
 
 
-workdir: "workspace_demo_v2"
-
-
-# config["workdir"]
+workdir: config["workdir"]
 
 
 src_dir = config["srcdir"]
-
-tmp_dir = "/scratch/midway3/yec"
-
+tmp_dir = config["tmpdir"]
 data_dir = os.path.dirname(workflow.configfiles[-1])
 ref_dir = data_dir
 
-if "samples_Treg" not in config:
+if "samples" not in config:
     sys.exit("`samples` is not defined in config file!")
 
-if "ref_GRCm39" not in config:
+if "references" not in config:
     sys.exit("`references` is not defined in config file!")
 
-REF = config["ref_GRCm39"]
+REF = config["references"]
 # print(workflow.basedir)
 REFTYPES = ["contamination", "spike", "sncRNA"]
 
@@ -37,7 +32,7 @@ run_ids = []
 sample2run = defaultdict(list)
 read_ids = set()
 # group: eg, WT, KD
-for g, v in config["samples_Treg"].items():
+for g, v in config["samples"].items():
     group_ids.append(g)
     # lib: input, treated
     for l, v2 in v.items():
@@ -600,7 +595,6 @@ rule rnaseq_qc:
         outdir="rnaseq_qc",
     shell:
         """
-        module load boost/1.75.0  gcc
         {params.path_rnaseqc} {params.gtf} {input} {params.outdir} -s {wildcards.sample} --coverage -v
         """
 
@@ -824,12 +818,13 @@ rule merge_mutated_treated_bam:
     resources:
         mem="64G",
     shell:
-        "{params.path_samtools} merge --input-fmt-option 'filter=[NM]>0' -@ {threads} -o {output.bam}##idx##{output.bai} {input}"
+        "{params.path_samtools} merge --write-index -@ {threads} --input-fmt-option 'filter=[NM]>0' -o {output.bam}##idx##{output.bai} {input}"
 
 
 rule prefilter_positions_by_group:
     input:
-        "merged_mutated_reads_by_group/{group}_{reftype}.bam",
+        bam="merged_mutated_reads_by_group/{group}_{reftype}.bam",
+        bai="merged_mutated_reads_by_group/{group}_{reftype}.bam.bai",
     output:
         "filter_positions_by_group/{group}_{reftype}_{refbase}.bed",
     params:
@@ -842,8 +837,8 @@ rule prefilter_positions_by_group:
         mem="86G",
     shell:
         """
-        {params.path_caller} -i {input} -r {params.ref} -b {wildcards.refbase} -f {params.flag} -d 3 -m 1 -F 3584 | \
-            awk 'BEGIN{{OFS="\\t"}}{{print $1,$2-1,$2,$4"/"$5,$4/$5,"{wildcards.strand}"}}' >{output}
+        {params.path_caller} -i {input.bam} -r {params.ref} -b {wildcards.refbase} -f {params.flag} -d 3 -m 1 -F 3584 | \
+            awk 'BEGIN{{OFS="\\t"}}{{print $1,$2-1,$2,$4"/"$5,$4/$5,"{params.strand}"}}' >{output}
         """
 
 

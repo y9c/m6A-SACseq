@@ -1,0 +1,559 @@
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided cores: 60
+Rules claiming more threads will be scaled down.
+Job stats:
+job                                count    min threads    max threads
+-------------------------------  -------  -------------  -------------
+all                                    1              1              1
+blastn_bam_sort                        4              4              4
+blastn_to_bam                          4              2              2
+call_mutation_of_spike                 4              4              4
+combine_runs                          16              4              4
+combined_unmap                         4             12             12
+compress_star_unmap                   16             12             12
+count_cutadapt_reads                   4              1              1
+count_genome_multiple                  1             32             32
+count_site_by_sample                  16              8              8
+cutadapt                               8             20             20
+dedup_bam_index                        8              4              4
+drop_duplicates                       16              8              8
+falco_after                           16              1              1
+falco_before                          16              1              1
+falco_unmap                           16              1              1
+filter_sites                           2              1              1
+get_covered_positions_by_group         4              1              1
+join_sites_by_group                    2              1              1
+map_to_contamination_by_bowtie2        8             24             24
+map_to_genome_by_star                  8             24             24
+map_to_sncRNA_by_bowtie2               8             24             24
+map_to_spike_by_bowtie2                8             24             24
+map_to_spikin_by_blastn                4             24             24
+merge_map                              4             12             12
+merge_mutated_treated_bam              2             16             16
+merge_unmap                            8             12             12
+prefilter_positions_by_group           4             24             24
+report_cutadapt                        1              1              1
+report_falco_after                     1              1              1
+report_falco_before                    1              1              1
+report_falco_unmap                     1              1              1
+report_rnaseqc                         1              1              1
+report_star                            1              1              1
+rnaseq_qc                              4              1              1
+separate_genome_combined               4              4              4
+separate_genome_dedup                  4              4              4
+sort_and_filter_bam_bowtie2           24              8              8
+spike_fasta                            4              1              1
+stat_dedup                             4              2              2
+stat_mapping                           4              2              2
+total                                266              1             32
+
+Select jobs to execute...
+
+[Sat Oct  1 01:41:52 2022]
+rule cutadapt:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep1-run1_R1.fq.gz, /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep1-run1_R2.fq.gz
+    output: cut_adapter/HeLa-WT-input-rep1-run1_cut_R1.fq, cut_adapter/HeLa-WT-input-rep1-run1_cut_R2.fq, cut_adapter/HeLa-WT-input-rep1-run1_cut_R1.fq.gz, cut_adapter/HeLa-WT-input-rep1-run1_cut_R2.fq.gz, cut_adapter/HeLa-WT-input-rep1-run1_short_R1.fq.gz, cut_adapter/HeLa-WT-input-rep1-run1_short_R2.fq.gz, cut_adapter/HeLa-WT-input-rep1-run1_step1.report, cut_adapter/HeLa-WT-input-rep1-run1_step2.report
+    jobid: 19
+    reason: Missing output files: cut_adapter/HeLa-WT-input-rep1-run1_step1.report, cut_adapter/HeLa-WT-input-rep1-run1_step2.report, cut_adapter/HeLa-WT-input-rep1-run1_cut_R2.fq.gz, cut_adapter/HeLa-WT-input-rep1-run1_cut_R1.fq.gz
+    wildcards: rn=HeLa-WT-input-rep1-run1
+    threads: 20
+    resources: tmpdir=/tmp, mem=30G
+
+
+[Sat Oct  1 01:41:52 2022]
+rule cutadapt:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep1-run2_R1.fq.gz, /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep1-run2_R2.fq.gz
+    output: cut_adapter/HeLa-WT-input-rep1-run2_cut_R1.fq, cut_adapter/HeLa-WT-input-rep1-run2_cut_R2.fq, cut_adapter/HeLa-WT-input-rep1-run2_cut_R1.fq.gz, cut_adapter/HeLa-WT-input-rep1-run2_cut_R2.fq.gz, cut_adapter/HeLa-WT-input-rep1-run2_short_R1.fq.gz, cut_adapter/HeLa-WT-input-rep1-run2_short_R2.fq.gz, cut_adapter/HeLa-WT-input-rep1-run2_step1.report, cut_adapter/HeLa-WT-input-rep1-run2_step2.report
+    jobid: 20
+    reason: Missing output files: cut_adapter/HeLa-WT-input-rep1-run2_step1.report, cut_adapter/HeLa-WT-input-rep1-run2_cut_R1.fq.gz, cut_adapter/HeLa-WT-input-rep1-run2_cut_R2.fq.gz, cut_adapter/HeLa-WT-input-rep1-run2_step2.report
+    wildcards: rn=HeLa-WT-input-rep1-run2
+    threads: 20
+    resources: tmpdir=/tmp, mem=30G
+
+
+[Sat Oct  1 01:41:52 2022]
+rule cutadapt:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep2-run2_R1.fq.gz, /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep2-run2_R2.fq.gz
+    output: cut_adapter/HeLa-WT-input-rep2-run2_cut_R1.fq, cut_adapter/HeLa-WT-input-rep2-run2_cut_R2.fq, cut_adapter/HeLa-WT-input-rep2-run2_cut_R1.fq.gz, cut_adapter/HeLa-WT-input-rep2-run2_cut_R2.fq.gz, cut_adapter/HeLa-WT-input-rep2-run2_short_R1.fq.gz, cut_adapter/HeLa-WT-input-rep2-run2_short_R2.fq.gz, cut_adapter/HeLa-WT-input-rep2-run2_step1.report, cut_adapter/HeLa-WT-input-rep2-run2_step2.report
+    jobid: 22
+    reason: Missing output files: cut_adapter/HeLa-WT-input-rep2-run2_cut_R1.fq.gz, cut_adapter/HeLa-WT-input-rep2-run2_step1.report, cut_adapter/HeLa-WT-input-rep2-run2_step2.report, cut_adapter/HeLa-WT-input-rep2-run2_cut_R2.fq.gz
+    wildcards: rn=HeLa-WT-input-rep2-run2
+    threads: 20
+    resources: tmpdir=/tmp, mem=30G
+
+[Sat Oct  1 01:41:54 2022]
+Finished job 22.
+1 of 266 steps (0.4%) done
+Removing temporary output cut_adapter/HeLa-WT-input-rep2-run2_cut_R1.fq.
+Removing temporary output cut_adapter/HeLa-WT-input-rep2-run2_cut_R2.fq.
+Select jobs to execute...
+
+[Sat Oct  1 01:41:54 2022]
+rule cutadapt:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep1-run1_R1.fq.gz, /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep1-run1_R2.fq.gz
+    output: cut_adapter/HeLa-WT-treated-rep1-run1_cut_R1.fq, cut_adapter/HeLa-WT-treated-rep1-run1_cut_R2.fq, cut_adapter/HeLa-WT-treated-rep1-run1_cut_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep1-run1_cut_R2.fq.gz, cut_adapter/HeLa-WT-treated-rep1-run1_short_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep1-run1_short_R2.fq.gz, cut_adapter/HeLa-WT-treated-rep1-run1_step1.report, cut_adapter/HeLa-WT-treated-rep1-run1_step2.report
+    jobid: 23
+    reason: Missing output files: cut_adapter/HeLa-WT-treated-rep1-run1_cut_R2.fq.gz, cut_adapter/HeLa-WT-treated-rep1-run1_cut_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep1-run1_step1.report, cut_adapter/HeLa-WT-treated-rep1-run1_step2.report
+    wildcards: rn=HeLa-WT-treated-rep1-run1
+    threads: 20
+    resources: tmpdir=/tmp, mem=30G
+
+[Sat Oct  1 01:41:54 2022]
+Finished job 20.
+2 of 266 steps (1%) done
+Removing temporary output cut_adapter/HeLa-WT-input-rep1-run2_cut_R1.fq.
+Removing temporary output cut_adapter/HeLa-WT-input-rep1-run2_cut_R2.fq.
+Select jobs to execute...
+
+[Sat Oct  1 01:41:54 2022]
+rule cutadapt:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep1-run2_R1.fq.gz, /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep1-run2_R2.fq.gz
+    output: cut_adapter/HeLa-WT-treated-rep1-run2_cut_R1.fq, cut_adapter/HeLa-WT-treated-rep1-run2_cut_R2.fq, cut_adapter/HeLa-WT-treated-rep1-run2_cut_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep1-run2_cut_R2.fq.gz, cut_adapter/HeLa-WT-treated-rep1-run2_short_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep1-run2_short_R2.fq.gz, cut_adapter/HeLa-WT-treated-rep1-run2_step1.report, cut_adapter/HeLa-WT-treated-rep1-run2_step2.report
+    jobid: 24
+    reason: Missing output files: cut_adapter/HeLa-WT-treated-rep1-run2_cut_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep1-run2_step2.report, cut_adapter/HeLa-WT-treated-rep1-run2_cut_R2.fq.gz, cut_adapter/HeLa-WT-treated-rep1-run2_step1.report
+    wildcards: rn=HeLa-WT-treated-rep1-run2
+    threads: 20
+    resources: tmpdir=/tmp, mem=30G
+
+[Sat Oct  1 01:41:54 2022]
+Finished job 19.
+3 of 266 steps (1%) done
+Removing temporary output cut_adapter/HeLa-WT-input-rep1-run1_cut_R1.fq.
+Removing temporary output cut_adapter/HeLa-WT-input-rep1-run1_cut_R2.fq.
+Select jobs to execute...
+
+[Sat Oct  1 01:41:54 2022]
+rule cutadapt:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep2-run2_R1.fq.gz, /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep2-run2_R2.fq.gz
+    output: cut_adapter/HeLa-WT-treated-rep2-run2_cut_R1.fq, cut_adapter/HeLa-WT-treated-rep2-run2_cut_R2.fq, cut_adapter/HeLa-WT-treated-rep2-run2_cut_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run2_cut_R2.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run2_short_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run2_short_R2.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run2_step1.report, cut_adapter/HeLa-WT-treated-rep2-run2_step2.report
+    jobid: 26
+    reason: Missing output files: cut_adapter/HeLa-WT-treated-rep2-run2_cut_R2.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run2_step1.report, cut_adapter/HeLa-WT-treated-rep2-run2_cut_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run2_step2.report
+    wildcards: rn=HeLa-WT-treated-rep2-run2
+    threads: 20
+    resources: tmpdir=/tmp, mem=30G
+
+[Sat Oct  1 01:41:56 2022]
+Finished job 26.
+4 of 266 steps (2%) done
+Removing temporary output cut_adapter/HeLa-WT-treated-rep2-run2_cut_R1.fq.
+Removing temporary output cut_adapter/HeLa-WT-treated-rep2-run2_cut_R2.fq.
+Select jobs to execute...
+
+[Sat Oct  1 01:41:56 2022]
+rule cutadapt:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep2-run1_R1.fq.gz, /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep2-run1_R2.fq.gz
+    output: cut_adapter/HeLa-WT-treated-rep2-run1_cut_R1.fq, cut_adapter/HeLa-WT-treated-rep2-run1_cut_R2.fq, cut_adapter/HeLa-WT-treated-rep2-run1_cut_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run1_cut_R2.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run1_short_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run1_short_R2.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run1_step1.report, cut_adapter/HeLa-WT-treated-rep2-run1_step2.report
+    jobid: 25
+    reason: Missing output files: cut_adapter/HeLa-WT-treated-rep2-run1_cut_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run1_step1.report, cut_adapter/HeLa-WT-treated-rep2-run1_step2.report, cut_adapter/HeLa-WT-treated-rep2-run1_cut_R2.fq.gz
+    wildcards: rn=HeLa-WT-treated-rep2-run1
+    threads: 20
+    resources: tmpdir=/tmp, mem=30G
+
+[Sat Oct  1 01:41:56 2022]
+Finished job 23.
+5 of 266 steps (2%) done
+Removing temporary output cut_adapter/HeLa-WT-treated-rep1-run1_cut_R1.fq.
+Removing temporary output cut_adapter/HeLa-WT-treated-rep1-run1_cut_R2.fq.
+Select jobs to execute...
+
+[Sat Oct  1 01:41:56 2022]
+rule cutadapt:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep2-run1_R1.fq.gz, /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep2-run1_R2.fq.gz
+    output: cut_adapter/HeLa-WT-input-rep2-run1_cut_R1.fq, cut_adapter/HeLa-WT-input-rep2-run1_cut_R2.fq, cut_adapter/HeLa-WT-input-rep2-run1_cut_R1.fq.gz, cut_adapter/HeLa-WT-input-rep2-run1_cut_R2.fq.gz, cut_adapter/HeLa-WT-input-rep2-run1_short_R1.fq.gz, cut_adapter/HeLa-WT-input-rep2-run1_short_R2.fq.gz, cut_adapter/HeLa-WT-input-rep2-run1_step1.report, cut_adapter/HeLa-WT-input-rep2-run1_step2.report
+    jobid: 21
+    reason: Missing output files: cut_adapter/HeLa-WT-input-rep2-run1_step2.report, cut_adapter/HeLa-WT-input-rep2-run1_step1.report, cut_adapter/HeLa-WT-input-rep2-run1_cut_R2.fq.gz, cut_adapter/HeLa-WT-input-rep2-run1_cut_R1.fq.gz
+    wildcards: rn=HeLa-WT-input-rep2-run1
+    threads: 20
+    resources: tmpdir=/tmp, mem=30G
+
+[Sat Oct  1 01:41:56 2022]
+Finished job 24.
+6 of 266 steps (2%) done
+Removing temporary output cut_adapter/HeLa-WT-treated-rep1-run2_cut_R1.fq.
+Removing temporary output cut_adapter/HeLa-WT-treated-rep1-run2_cut_R2.fq.
+Select jobs to execute...
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_before:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep1-run2_R1.fq.gz
+    output: quality_control/falco_before/HeLa-WT-treated-rep1-run2_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-treated-rep1-run2_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-treated-rep1-run2_R1/summary.txt
+    jobid: 12
+    reason: Missing output files: quality_control/falco_before/HeLa-WT-treated-rep1-run2_R1/fastqc_data.txt
+    wildcards: rn=HeLa-WT-treated-rep1-run2, rd=R1
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_after:
+    input: cut_adapter/HeLa-WT-input-rep2-run2_cut_R2.fq.gz
+    output: quality_control/falco_after/HeLa-WT-input-rep2-run2_R2/fastqc_report.html, quality_control/falco_after/HeLa-WT-input-rep2-run2_R2/fastqc_data.txt, quality_control/falco_after/HeLa-WT-input-rep2-run2_R2/summary.txt
+    jobid: 35
+    reason: Missing output files: quality_control/falco_after/HeLa-WT-input-rep2-run2_R2/fastqc_data.txt; Input files updated by another job: cut_adapter/HeLa-WT-input-rep2-run2_cut_R2.fq.gz
+    wildcards: rn=HeLa-WT-input-rep2-run2, rd=R2
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_before:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep1-run2_R2.fq.gz
+    output: quality_control/falco_before/HeLa-WT-input-rep1-run2_R2/fastqc_report.html, quality_control/falco_before/HeLa-WT-input-rep1-run2_R2/fastqc_data.txt, quality_control/falco_before/HeLa-WT-input-rep1-run2_R2/summary.txt
+    jobid: 5
+    reason: Missing output files: quality_control/falco_before/HeLa-WT-input-rep1-run2_R2/fastqc_data.txt
+    wildcards: rn=HeLa-WT-input-rep1-run2, rd=R2
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_after:
+    input: cut_adapter/HeLa-WT-input-rep1-run1_cut_R1.fq.gz
+    output: quality_control/falco_after/HeLa-WT-input-rep1-run1_R1/fastqc_report.html, quality_control/falco_after/HeLa-WT-input-rep1-run1_R1/fastqc_data.txt, quality_control/falco_after/HeLa-WT-input-rep1-run1_R1/summary.txt
+    jobid: 28
+    reason: Missing output files: quality_control/falco_after/HeLa-WT-input-rep1-run1_R1/fastqc_data.txt; Input files updated by another job: cut_adapter/HeLa-WT-input-rep1-run1_cut_R1.fq.gz
+    wildcards: rn=HeLa-WT-input-rep1-run1, rd=R1
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_before:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep1-run2_R2.fq.gz
+    output: quality_control/falco_before/HeLa-WT-treated-rep1-run2_R2/fastqc_report.html, quality_control/falco_before/HeLa-WT-treated-rep1-run2_R2/fastqc_data.txt, quality_control/falco_before/HeLa-WT-treated-rep1-run2_R2/summary.txt
+    jobid: 13
+    reason: Missing output files: quality_control/falco_before/HeLa-WT-treated-rep1-run2_R2/fastqc_data.txt
+    wildcards: rn=HeLa-WT-treated-rep1-run2, rd=R2
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_after:
+    input: cut_adapter/HeLa-WT-treated-rep1-run1_cut_R1.fq.gz
+    output: quality_control/falco_after/HeLa-WT-treated-rep1-run1_R1/fastqc_report.html, quality_control/falco_after/HeLa-WT-treated-rep1-run1_R1/fastqc_data.txt, quality_control/falco_after/HeLa-WT-treated-rep1-run1_R1/summary.txt
+    jobid: 36
+    reason: Missing output files: quality_control/falco_after/HeLa-WT-treated-rep1-run1_R1/fastqc_data.txt; Input files updated by another job: cut_adapter/HeLa-WT-treated-rep1-run1_cut_R1.fq.gz
+    wildcards: rn=HeLa-WT-treated-rep1-run1, rd=R1
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_after:
+    input: cut_adapter/HeLa-WT-input-rep1-run1_cut_R2.fq.gz
+    output: quality_control/falco_after/HeLa-WT-input-rep1-run1_R2/fastqc_report.html, quality_control/falco_after/HeLa-WT-input-rep1-run1_R2/fastqc_data.txt, quality_control/falco_after/HeLa-WT-input-rep1-run1_R2/summary.txt
+    jobid: 29
+    reason: Missing output files: quality_control/falco_after/HeLa-WT-input-rep1-run1_R2/fastqc_data.txt; Input files updated by another job: cut_adapter/HeLa-WT-input-rep1-run1_cut_R2.fq.gz
+    wildcards: rn=HeLa-WT-input-rep1-run1, rd=R2
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_before:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep2-run1_R1.fq.gz
+    output: quality_control/falco_before/HeLa-WT-treated-rep2-run1_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-treated-rep2-run1_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-treated-rep2-run1_R1/summary.txt
+    jobid: 14
+    reason: Missing output files: quality_control/falco_before/HeLa-WT-treated-rep2-run1_R1/fastqc_data.txt
+    wildcards: rn=HeLa-WT-treated-rep2-run1, rd=R1
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_after:
+    input: cut_adapter/HeLa-WT-input-rep1-run2_cut_R1.fq.gz
+    output: quality_control/falco_after/HeLa-WT-input-rep1-run2_R1/fastqc_report.html, quality_control/falco_after/HeLa-WT-input-rep1-run2_R1/fastqc_data.txt, quality_control/falco_after/HeLa-WT-input-rep1-run2_R1/summary.txt
+    jobid: 30
+    reason: Missing output files: quality_control/falco_after/HeLa-WT-input-rep1-run2_R1/fastqc_data.txt; Input files updated by another job: cut_adapter/HeLa-WT-input-rep1-run2_cut_R1.fq.gz
+    wildcards: rn=HeLa-WT-input-rep1-run2, rd=R1
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_after:
+    input: cut_adapter/HeLa-WT-treated-rep1-run2_cut_R1.fq.gz
+    output: quality_control/falco_after/HeLa-WT-treated-rep1-run2_R1/fastqc_report.html, quality_control/falco_after/HeLa-WT-treated-rep1-run2_R1/fastqc_data.txt, quality_control/falco_after/HeLa-WT-treated-rep1-run2_R1/summary.txt
+    jobid: 38
+    reason: Missing output files: quality_control/falco_after/HeLa-WT-treated-rep1-run2_R1/fastqc_data.txt; Input files updated by another job: cut_adapter/HeLa-WT-treated-rep1-run2_cut_R1.fq.gz
+    wildcards: rn=HeLa-WT-treated-rep1-run2, rd=R1
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_before:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep2-run2_R1.fq.gz
+    output: quality_control/falco_before/HeLa-WT-input-rep2-run2_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-input-rep2-run2_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-input-rep2-run2_R1/summary.txt
+    jobid: 8
+    reason: Missing output files: quality_control/falco_before/HeLa-WT-input-rep2-run2_R1/fastqc_data.txt
+    wildcards: rn=HeLa-WT-input-rep2-run2, rd=R1
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_after:
+    input: cut_adapter/HeLa-WT-input-rep1-run2_cut_R2.fq.gz
+    output: quality_control/falco_after/HeLa-WT-input-rep1-run2_R2/fastqc_report.html, quality_control/falco_after/HeLa-WT-input-rep1-run2_R2/fastqc_data.txt, quality_control/falco_after/HeLa-WT-input-rep1-run2_R2/summary.txt
+    jobid: 31
+    reason: Missing output files: quality_control/falco_after/HeLa-WT-input-rep1-run2_R2/fastqc_data.txt; Input files updated by another job: cut_adapter/HeLa-WT-input-rep1-run2_cut_R2.fq.gz
+    wildcards: rn=HeLa-WT-input-rep1-run2, rd=R2
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_before:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep2-run2_R1.fq.gz
+    output: quality_control/falco_before/HeLa-WT-treated-rep2-run2_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-treated-rep2-run2_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-treated-rep2-run2_R1/summary.txt
+    jobid: 16
+    reason: Missing output files: quality_control/falco_before/HeLa-WT-treated-rep2-run2_R1/fastqc_data.txt
+    wildcards: rn=HeLa-WT-treated-rep2-run2, rd=R1
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_before:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep1-run1_R1.fq.gz
+    output: quality_control/falco_before/HeLa-WT-input-rep1-run1_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-input-rep1-run1_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-input-rep1-run1_R1/summary.txt
+    jobid: 2
+    reason: Missing output files: quality_control/falco_before/HeLa-WT-input-rep1-run1_R1/fastqc_data.txt
+    wildcards: rn=HeLa-WT-input-rep1-run1, rd=R1
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_after:
+    input: cut_adapter/HeLa-WT-treated-rep1-run2_cut_R2.fq.gz
+    output: quality_control/falco_after/HeLa-WT-treated-rep1-run2_R2/fastqc_report.html, quality_control/falco_after/HeLa-WT-treated-rep1-run2_R2/fastqc_data.txt, quality_control/falco_after/HeLa-WT-treated-rep1-run2_R2/summary.txt
+    jobid: 39
+    reason: Missing output files: quality_control/falco_after/HeLa-WT-treated-rep1-run2_R2/fastqc_data.txt; Input files updated by another job: cut_adapter/HeLa-WT-treated-rep1-run2_cut_R2.fq.gz
+    wildcards: rn=HeLa-WT-treated-rep1-run2, rd=R2
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_before:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep2-run2_R2.fq.gz
+    output: quality_control/falco_before/HeLa-WT-input-rep2-run2_R2/fastqc_report.html, quality_control/falco_before/HeLa-WT-input-rep2-run2_R2/fastqc_data.txt, quality_control/falco_before/HeLa-WT-input-rep2-run2_R2/summary.txt
+    jobid: 9
+    reason: Missing output files: quality_control/falco_before/HeLa-WT-input-rep2-run2_R2/fastqc_data.txt
+    wildcards: rn=HeLa-WT-input-rep2-run2, rd=R2
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_before:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep1-run1_R1.fq.gz
+    output: quality_control/falco_before/HeLa-WT-treated-rep1-run1_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-treated-rep1-run1_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-treated-rep1-run1_R1/summary.txt
+    jobid: 10
+    reason: Missing output files: quality_control/falco_before/HeLa-WT-treated-rep1-run1_R1/fastqc_data.txt
+    wildcards: rn=HeLa-WT-treated-rep1-run1, rd=R1
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_before:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep1-run1_R2.fq.gz
+    output: quality_control/falco_before/HeLa-WT-input-rep1-run1_R2/fastqc_report.html, quality_control/falco_before/HeLa-WT-input-rep1-run1_R2/fastqc_data.txt, quality_control/falco_before/HeLa-WT-input-rep1-run1_R2/summary.txt
+    jobid: 3
+    reason: Missing output files: quality_control/falco_before/HeLa-WT-input-rep1-run1_R2/fastqc_data.txt
+    wildcards: rn=HeLa-WT-input-rep1-run1, rd=R2
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_after:
+    input: cut_adapter/HeLa-WT-input-rep2-run2_cut_R1.fq.gz
+    output: quality_control/falco_after/HeLa-WT-input-rep2-run2_R1/fastqc_report.html, quality_control/falco_after/HeLa-WT-input-rep2-run2_R1/fastqc_data.txt, quality_control/falco_after/HeLa-WT-input-rep2-run2_R1/summary.txt
+    jobid: 34
+    reason: Missing output files: quality_control/falco_after/HeLa-WT-input-rep2-run2_R1/fastqc_data.txt; Input files updated by another job: cut_adapter/HeLa-WT-input-rep2-run2_cut_R1.fq.gz
+    wildcards: rn=HeLa-WT-input-rep2-run2, rd=R1
+    resources: tmpdir=/tmp
+
+
+[Sat Oct  1 01:41:56 2022]
+rule falco_before:
+    input: /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep1-run2_R1.fq.gz
+    output: quality_control/falco_before/HeLa-WT-input-rep1-run2_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-input-rep1-run2_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-input-rep1-run2_R1/summary.txt
+    jobid: 4
+    reason: Missing output files: quality_control/falco_before/HeLa-WT-input-rep1-run2_R1/fastqc_data.txt
+    wildcards: rn=HeLa-WT-input-rep1-run2, rd=R1
+    resources: tmpdir=/tmp
+
+Terminating processes on user request, this might take some time.
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+Error in rule falco_before:
+    jobid: 12
+    output: quality_control/falco_before/HeLa-WT-treated-rep1-run2_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-treated-rep1-run2_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-treated-rep1-run2_R1/summary.txt
+    shell:
+        falco -o quality_control/falco_before/HeLa-WT-treated-rep1-run2_R1 /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep1-run2_R1.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+Error in rule falco_before:
+    jobid: 3
+    output: quality_control/falco_before/HeLa-WT-input-rep1-run1_R2/fastqc_report.html, quality_control/falco_before/HeLa-WT-input-rep1-run1_R2/fastqc_data.txt, quality_control/falco_before/HeLa-WT-input-rep1-run1_R2/summary.txt
+    shell:
+        falco -o quality_control/falco_before/HeLa-WT-input-rep1-run1_R2 /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep1-run1_R2.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+Error in rule falco_after:
+    jobid: 29
+    output: quality_control/falco_after/HeLa-WT-input-rep1-run1_R2/fastqc_report.html, quality_control/falco_after/HeLa-WT-input-rep1-run1_R2/fastqc_data.txt, quality_control/falco_after/HeLa-WT-input-rep1-run1_R2/summary.txt
+    shell:
+        falco -o quality_control/falco_after/HeLa-WT-input-rep1-run1_R2 cut_adapter/HeLa-WT-input-rep1-run1_cut_R2.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+Error in rule falco_after:
+    jobid: 35
+    output: quality_control/falco_after/HeLa-WT-input-rep2-run2_R2/fastqc_report.html, quality_control/falco_after/HeLa-WT-input-rep2-run2_R2/fastqc_data.txt, quality_control/falco_after/HeLa-WT-input-rep2-run2_R2/summary.txt
+    shell:
+        falco -o quality_control/falco_after/HeLa-WT-input-rep2-run2_R2 cut_adapter/HeLa-WT-input-rep2-run2_cut_R2.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Sat Oct  1 01:41:57 2022]
+Error in rule falco_before:
+    jobid: 8
+    output: quality_control/falco_before/HeLa-WT-input-rep2-run2_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-input-rep2-run2_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-input-rep2-run2_R1/summary.txt
+    shell:
+        falco -o quality_control/falco_before/HeLa-WT-input-rep2-run2_R1 /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep2-run2_R1.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+[Sat Oct  1 01:41:57 2022]
+Error in rule falco_before:
+    jobid: 14
+    output: quality_control/falco_before/HeLa-WT-treated-rep2-run1_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-treated-rep2-run1_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-treated-rep2-run1_R1/summary.txt
+    shell:
+        falco -o quality_control/falco_before/HeLa-WT-treated-rep2-run1_R1 /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep2-run1_R1.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Sat Oct  1 01:41:57 2022]
+Error in rule falco_after:
+    jobid: 38
+    output: quality_control/falco_after/HeLa-WT-treated-rep1-run2_R1/fastqc_report.html, quality_control/falco_after/HeLa-WT-treated-rep1-run2_R1/fastqc_data.txt, quality_control/falco_after/HeLa-WT-treated-rep1-run2_R1/summary.txt
+    shell:
+        falco -o quality_control/falco_after/HeLa-WT-treated-rep1-run2_R1 cut_adapter/HeLa-WT-treated-rep1-run2_cut_R1.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule falco_before:
+    jobid: 10
+    output: quality_control/falco_before/HeLa-WT-treated-rep1-run1_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-treated-rep1-run1_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-treated-rep1-run1_R1/summary.txt
+    shell:
+        falco -o quality_control/falco_before/HeLa-WT-treated-rep1-run1_R1 /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep1-run1_R1.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule falco_before:
+    jobid: 4
+    output: quality_control/falco_before/HeLa-WT-input-rep1-run2_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-input-rep1-run2_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-input-rep1-run2_R1/summary.txt
+    shell:
+        falco -o quality_control/falco_before/HeLa-WT-input-rep1-run2_R1 /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep1-run2_R1.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule cutadapt:
+    jobid: 25
+    output: cut_adapter/HeLa-WT-treated-rep2-run1_cut_R1.fq, cut_adapter/HeLa-WT-treated-rep2-run1_cut_R2.fq, cut_adapter/HeLa-WT-treated-rep2-run1_cut_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run1_cut_R2.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run1_short_R1.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run1_short_R2.fq.gz, cut_adapter/HeLa-WT-treated-rep2-run1_step1.report, cut_adapter/HeLa-WT-treated-rep2-run1_step2.report
+    shell:
+        
+        cutadapt -j 20           -U 11           --rename='{id}_{r2.cut_prefix} {comment}'           --max-n=0 -e 0.15 -q 20 --nextseq-trim=20           -O 6           --pair-filter=both           -a AGATCGGAAGAGCACACGTCTG -A AGATCGGAAGAGCGTCGTGT           -o cut_adapter/HeLa-WT-treated-rep2-run1_cut_R1.fq -p cut_adapter/HeLa-WT-treated-rep2-run1_cut_R2.fq           /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep2-run1_R1.fq.gz /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep2-run1_R2.fq.gz >cut_adapter/HeLa-WT-treated-rep2-run1_step1.report 
+        cutadapt -j 20           -m 15           -u -11           -n 5           -O 12           -g ACACGACGCTCTTCCGATCT -a AGATCGGAAGAGCGTCGTGT           -G ACACGACGCTCTTCCGATCT -A AGATCGGAAGAGCGTCGTGT           --too-short-output=cut_adapter/HeLa-WT-treated-rep2-run1_short_R1.fq.gz --too-short-paired-output=cut_adapter/HeLa-WT-treated-rep2-run1_short_R2.fq.gz           -o cut_adapter/HeLa-WT-treated-rep2-run1_cut_R1.fq.gz -p cut_adapter/HeLa-WT-treated-rep2-run1_cut_R2.fq.gz           cut_adapter/HeLa-WT-treated-rep2-run1_cut_R1.fq cut_adapter/HeLa-WT-treated-rep2-run1_cut_R2.fq >cut_adapter/HeLa-WT-treated-rep2-run1_step2.report 
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule falco_after:
+    jobid: 39
+    output: quality_control/falco_after/HeLa-WT-treated-rep1-run2_R2/fastqc_report.html, quality_control/falco_after/HeLa-WT-treated-rep1-run2_R2/fastqc_data.txt, quality_control/falco_after/HeLa-WT-treated-rep1-run2_R2/summary.txt
+    shell:
+        falco -o quality_control/falco_after/HeLa-WT-treated-rep1-run2_R2 cut_adapter/HeLa-WT-treated-rep1-run2_cut_R2.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule falco_before:
+    jobid: 13
+    output: quality_control/falco_before/HeLa-WT-treated-rep1-run2_R2/fastqc_report.html, quality_control/falco_before/HeLa-WT-treated-rep1-run2_R2/fastqc_data.txt, quality_control/falco_before/HeLa-WT-treated-rep1-run2_R2/summary.txt
+    shell:
+        falco -o quality_control/falco_before/HeLa-WT-treated-rep1-run2_R2 /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep1-run2_R2.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule falco_before:
+    jobid: 2
+    output: quality_control/falco_before/HeLa-WT-input-rep1-run1_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-input-rep1-run1_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-input-rep1-run1_R1/summary.txt
+    shell:
+        falco -o quality_control/falco_before/HeLa-WT-input-rep1-run1_R1 /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep1-run1_R1.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule falco_before:
+    jobid: 5
+    output: quality_control/falco_before/HeLa-WT-input-rep1-run2_R2/fastqc_report.html, quality_control/falco_before/HeLa-WT-input-rep1-run2_R2/fastqc_data.txt, quality_control/falco_before/HeLa-WT-input-rep1-run2_R2/summary.txt
+    shell:
+        falco -o quality_control/falco_before/HeLa-WT-input-rep1-run2_R2 /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep1-run2_R2.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule falco_after:
+    jobid: 28
+    output: quality_control/falco_after/HeLa-WT-input-rep1-run1_R1/fastqc_report.html, quality_control/falco_after/HeLa-WT-input-rep1-run1_R1/fastqc_data.txt, quality_control/falco_after/HeLa-WT-input-rep1-run1_R1/summary.txt
+    shell:
+        falco -o quality_control/falco_after/HeLa-WT-input-rep1-run1_R1 cut_adapter/HeLa-WT-input-rep1-run1_cut_R1.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule falco_after:
+    jobid: 31
+    output: quality_control/falco_after/HeLa-WT-input-rep1-run2_R2/fastqc_report.html, quality_control/falco_after/HeLa-WT-input-rep1-run2_R2/fastqc_data.txt, quality_control/falco_after/HeLa-WT-input-rep1-run2_R2/summary.txt
+    shell:
+        falco -o quality_control/falco_after/HeLa-WT-input-rep1-run2_R2 cut_adapter/HeLa-WT-input-rep1-run2_cut_R2.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule falco_before:
+    jobid: 9
+    output: quality_control/falco_before/HeLa-WT-input-rep2-run2_R2/fastqc_report.html, quality_control/falco_before/HeLa-WT-input-rep2-run2_R2/fastqc_data.txt, quality_control/falco_before/HeLa-WT-input-rep2-run2_R2/summary.txt
+    shell:
+        falco -o quality_control/falco_before/HeLa-WT-input-rep2-run2_R2 /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep2-run2_R2.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule falco_after:
+    jobid: 30
+    output: quality_control/falco_after/HeLa-WT-input-rep1-run2_R1/fastqc_report.html, quality_control/falco_after/HeLa-WT-input-rep1-run2_R1/fastqc_data.txt, quality_control/falco_after/HeLa-WT-input-rep1-run2_R1/summary.txt
+    shell:
+        falco -o quality_control/falco_after/HeLa-WT-input-rep1-run2_R1 cut_adapter/HeLa-WT-input-rep1-run2_cut_R1.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule falco_after:
+    jobid: 36
+    output: quality_control/falco_after/HeLa-WT-treated-rep1-run1_R1/fastqc_report.html, quality_control/falco_after/HeLa-WT-treated-rep1-run1_R1/fastqc_data.txt, quality_control/falco_after/HeLa-WT-treated-rep1-run1_R1/summary.txt
+    shell:
+        falco -o quality_control/falco_after/HeLa-WT-treated-rep1-run1_R1 cut_adapter/HeLa-WT-treated-rep1-run1_cut_R1.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule falco_after:
+    jobid: 34
+    output: quality_control/falco_after/HeLa-WT-input-rep2-run2_R1/fastqc_report.html, quality_control/falco_after/HeLa-WT-input-rep2-run2_R1/fastqc_data.txt, quality_control/falco_after/HeLa-WT-input-rep2-run2_R1/summary.txt
+    shell:
+        falco -o quality_control/falco_after/HeLa-WT-input-rep2-run2_R1 cut_adapter/HeLa-WT-input-rep2-run2_cut_R1.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule falco_before:
+    jobid: 16
+    output: quality_control/falco_before/HeLa-WT-treated-rep2-run2_R1/fastqc_report.html, quality_control/falco_before/HeLa-WT-treated-rep2-run2_R1/fastqc_data.txt, quality_control/falco_before/HeLa-WT-treated-rep2-run2_R1/summary.txt
+    shell:
+        falco -o quality_control/falco_before/HeLa-WT-treated-rep2-run2_R1 /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-treated-rep2-run2_R1.fq.gz
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Error in rule cutadapt:
+    jobid: 21
+    output: cut_adapter/HeLa-WT-input-rep2-run1_cut_R1.fq, cut_adapter/HeLa-WT-input-rep2-run1_cut_R2.fq, cut_adapter/HeLa-WT-input-rep2-run1_cut_R1.fq.gz, cut_adapter/HeLa-WT-input-rep2-run1_cut_R2.fq.gz, cut_adapter/HeLa-WT-input-rep2-run1_short_R1.fq.gz, cut_adapter/HeLa-WT-input-rep2-run1_short_R2.fq.gz, cut_adapter/HeLa-WT-input-rep2-run1_step1.report, cut_adapter/HeLa-WT-input-rep2-run1_step2.report
+    shell:
+        
+        cutadapt -j 20           -U 11           --rename='{id}_{r2.cut_prefix} {comment}'           --max-n=0 -e 0.15 -q 20 --nextseq-trim=20           -O 6           --pair-filter=both           -a AGATCGGAAGAGCACACGTCTG -A AGATCGGAAGAGCGTCGTGT           -o cut_adapter/HeLa-WT-input-rep2-run1_cut_R1.fq -p cut_adapter/HeLa-WT-input-rep2-run1_cut_R2.fq           /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep2-run1_R1.fq.gz /home/yec/projects/m6A_SACseq/m6A-SACseq/test/rawdata/HeLa-WT-polyA-input-rep2-run1_R2.fq.gz >cut_adapter/HeLa-WT-input-rep2-run1_step1.report 
+        cutadapt -j 20           -m 15           -u -11           -n 5           -O 12           -g ACACGACGCTCTTCCGATCT -a AGATCGGAAGAGCGTCGTGT           -G ACACGACGCTCTTCCGATCT -A AGATCGGAAGAGCGTCGTGT           --too-short-output=cut_adapter/HeLa-WT-input-rep2-run1_short_R1.fq.gz --too-short-paired-output=cut_adapter/HeLa-WT-input-rep2-run1_short_R2.fq.gz           -o cut_adapter/HeLa-WT-input-rep2-run1_cut_R1.fq.gz -p cut_adapter/HeLa-WT-input-rep2-run1_cut_R2.fq.gz           cut_adapter/HeLa-WT-input-rep2-run1_cut_R1.fq cut_adapter/HeLa-WT-input-rep2-run1_cut_R2.fq >cut_adapter/HeLa-WT-input-rep2-run1_step2.report 
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Complete log: ../.snakemake/log/2022-10-01T014151.968262.snakemake.log

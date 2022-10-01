@@ -1,0 +1,46 @@
+samples:
+  HeLa-WT:
+    input:
+      rep1:
+        - R1: rawdata/HeLa-WT-polyA-input-rep1-run1_R1.fq.gz
+          R2: rawdata/HeLa-WT-polyA-input-rep1-run1_R2.fq.gz
+        - R1: rawdata/HeLa-WT-polyA-input-rep1-run2_R1.fq.gz
+          R2: rawdata/HeLa-WT-polyA-input-rep1-run2_R2.fq.gz
+      rep2:
+        - R1: rawdata/HeLa-WT-polyA-input-rep2-run1_R1.fq.gz
+          R2: rawdata/HeLa-WT-polyA-input-rep2-run1_R2.fq.gz
+        - R1: rawdata/HeLa-WT-polyA-input-rep2-run2_R1.fq.gz
+          R2: rawdata/HeLa-WT-polyA-input-rep2-run2_R2.fq.gz
+    treated:
+      rep1:
+        - R1: rawdata/HeLa-WT-polyA-treated-rep1-run1_R1.fq.gz
+          R2: rawdata/HeLa-WT-polyA-treated-rep1-run1_R2.fq.gz
+        - R1: rawdata/HeLa-WT-polyA-treated-rep1-run2_R1.fq.gz
+          R2: rawdata/HeLa-WT-polyA-treated-rep1-run2_R2.fq.gz
+      rep2:
+        - R1: rawdata/HeLa-WT-polyA-treated-rep2-run1_R1.fq.gz
+          R2: rawdata/HeLa-WT-polyA-treated-rep2-run1_R2.fq.gz
+        - R1: rawdata/HeLa-WT-polyA-treated-rep2-run2_R1.fq.gz
+          R2: rawdata/HeLa-WT-polyA-treated-rep2-run2_R2.fq.gz
+
+references:
+  spike:
+    fa: ref/spike_expand.fa
+    bt2: ref/spike_expand
+  spikeN:
+    fa: ref/spike_degenerate.fa
+    blast: ref/spike_degenerate
+  contamination:
+    fa: ref/contamination.fa
+    bt2: ref/contamination
+  sncRNA:
+    fa: ref/sncRNA_human.fa
+    bt2: ref/sncRNA_human
+  genome:
+    fa: ref/genome_human.fa
+    fai: ref/genome_human
+    gtf: ref/genome_human.gtf
+    gtf_collapse: ref/genome_human.collapse.gtf
+    star: ref/genome_human
+
+workdir: workspace

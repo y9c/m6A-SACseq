@@ -18,6 +18,10 @@ else
 fi
 
 # TODO: let docker to do this, since user might not hve STAR, bowtie2 installed
+if ! command -v samtools >/dev/null 2>&1; then
+  echo "samtools shold be installed"
+  exit 1
+fi
 if ! command -v makeblastdb >/dev/null 2>&1; then
   echo "BLAST (makeblastdb) shold be installed"
   exit 1
@@ -164,13 +168,20 @@ fi
 
 # prepare sncRNA index
 echo "$(date -u)  Preparing index for rRNA + tRNA + snoRNA + snRNA + other non coding RNA (${species}) ..."
-download_db "${dbpath}/${species_prefix}.sncRNA.fa.gz" ${outdir}/rRNA_${species}.fa
+# prepare fa file
+download_db "${dbpath}/${species_prefix}.sncRNA.fa.gz" ${outdir}/sncRNA_${species}.fa
+# prepare fai file
+samtools faidx ${outdir}/sncRNA_${species}.fa 2>&1 >>${logfile}
 bowtie2-build --threads {threads} ${outdir}/sncRNA_${species}.fa ${outdir}/sncRNA_${species} 1>>${logfile} 2>>${logfile}
 
 # prepare genome index
 echo "$(date -u)  Preparing index for genomne (${species}) ..."
-download_db ${url_gtf} ${outdir}/genome_${species}.gtf
+# prepare fa file
 download_db ${url_fa} ${outdir}/genome_${species}.fa
+# prepare fai file
+samtools faidx ${outdir}/genome_${species}.fa 2>&1 >>${logfile}
+# prepare gtf file
+download_db ${url_gtf} ${outdir}/genome_${species}.gtf
 # collpase gtf (TODO: check if python packages are installed)
 wget -qO ${outdir}/collapse_annotation.py https://raw.githubusercontent.com/broadinstitute/gtex-pipeline/master/gene_model/collapse_annotation.py 1>>${logfile} 2>>${logfile}
 python3 ${outdir}/collapse_annotation.py ${outdir}/genome_${species}.collapse.gtf ${outdir}/genome_${species}.gtf 1>>${logfile} 2>>${logfile}
@@ -200,10 +211,11 @@ echo "    fa: ${outdir}/contamination.fa"
 echo "    bt2: ${outdir}/contamination"
 echo "  sncRNA:"
 echo "    fa: ${outdir}/sncRNA_${species}.fa"
+echo "    fa: ${outdir}/sncRNA_${species}.fa.fai"
 echo "    bt2: ${outdir}/sncRNA_${species}"
 echo "  genome:"
 echo "    fa: ${outdir}/genome_${species}.fa"
-echo "    fai: ${outdir}/genome_${species}"
+echo "    fai: ${outdir}/genome_${species}.fa.fai"
 echo "    gtf: ${outdir}/genome_${species}.gtf"
 echo "    gtf_collapse: ${outdir}/genome_${species}.collapse.gtf"
 echo "    star: ${outdir}/genome_${species}"

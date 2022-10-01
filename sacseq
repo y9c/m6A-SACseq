@@ -27,6 +27,7 @@ printf "$logo\n"
 # Set default values
 conf="data.yaml"
 cores=48
+snake="/opt/pipeline/Snakefile"
 
 # https://stackoverflow.com/a/62616466/5693642
 # Convenience functions.
@@ -45,6 +46,7 @@ if [ "$#" != 0 ]; then
       -q|--quite) quite='true';;
       -j|--jobs|--cores) assert_argument "$1" "$opt"; cores="$1"; shift;;
       -c|--conf) assert_argument "$1" "$opt"; conf="$1"; shift;;
+      -s|--snake) assert_argument "$1" "$opt"; snake="$1"; shift;;
       -p|--profile) assert_argument "$1" "$opt"; profile="$1"; shift;;
 
       # Arguments processing. You may remove any unneeded line after the 1st.
@@ -60,9 +62,21 @@ if [ "$#" != 0 ]; then
   shift  # $EOL
 fi
 
-
-if [[ -n ${profile} ]]; then
-  FLASK_ENV=development snakemake -q --rerun-incomplete -s /opt/pipeline/Snakefile -j ${cores} --configfiles /opt/pipeline/config.yaml ${conf} --profile ${profile}
-else
-  FLASK_ENV=development snakemake -q --rerun-incomplete -s /opt/pipeline/Snakefile -j ${cores} --configfiles /opt/pipeline/config.yaml ${conf}
-fi
+panoptes --ip 0.0.0.0 --port 5000 2>/dev/null &
+export PANOPTES_PID=$!
+echo "PANOPTES_PID=$PANOPTES_PID"
+trap 'kill -s SIGKILL $PANOPTES_PID' EXIT
+while true; do
+  if curl -s http://127.0.0.1:5000/api/service-info | grep -q running; then
+    if [[ -n ${profile} ]]; then
+      snakemake --wms-monitor http://127.0.0.1:5000 -p --rerun-incomplete -s ${snake} -j ${cores} --configfiles /opt/pipeline/config.yaml ${conf} --profile ${profile}
+    else
+      snakemake --wms-monitor http://127.0.0.1:5000 -p --rerun-incomplete -s ${snake} -j ${cores} --configfiles /opt/pipeline/config.yaml ${conf}
+    fi
+    rm .panoptes.db
+    kill -s SIGKILL $PANOPTES_PID
+    break
+  fi
+  echo "$(date) waiting for service to start..."
+  sleep 2
+done

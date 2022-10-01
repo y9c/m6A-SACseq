@@ -11,7 +11,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y --no-
 # install miniconda
 RUN wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.11.0-Linux-x86_64.sh -O /tmp/miniconda.sh && bash /tmp/miniconda.sh -b -p /opt/miniconda && rm -rf /tmp/miniconda.sh && export PATH="/opt/miniconda/bin:$PATH"
 # install package by conda
-RUN conda install mamba -n base -y -c conda-forge && mamba install -y -c conda-forge libzlib && mamba install -y -c bioconda falco bowtie2 star samtools==1.14 bedtools fastp seqtk blast subread numpy pandas pysam pyfaidx && mamba clean -afy && pip3 install snakemake==6.15.5 cutadapt==3.5 multiqc Flask
+RUN conda install mamba -n base -y -c conda-forge && mamba install -y -c conda-forge libzlib && mamba install -y -c bioconda falco bowtie2 star samtools==1.14 bedtools fastp seqtk blast subread numpy pandas pysam pyfaidx && mamba clean -afy && pip3 install snakemake==6.15.5 cutadapt==3.5 multiqc panoptes-ui
 # install software directly
 RUN wget https://github.com/getzlab/rnaseqc/releases/download/v2.4.2/rnaseqc.v2.4.2.linux.gz -O /opt/rnaseqc.gz && gunzip /opt/rnaseqc.gz && chmod +x /opt/rnaseqc
 # install blast2bam

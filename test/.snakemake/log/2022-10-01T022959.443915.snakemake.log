@@ -1,0 +1,54 @@
+Job stats:
+job                               count    min threads    max threads
+------------------------------  -------  -------------  -------------
+all                                   1              1              1
+blastn_bam_sort                       1              4              4
+blastn_to_bam                         1              2              2
+call_mutation_of_spike                1              4              4
+combine_runs                          1              4              4
+combined_unmap                        1             12             12
+compress_star_unmap                   2             12             12
+count_genome_multiple                 1             32             32
+count_site_by_sample                 16              8              8
+dedup_bam_index                       1              4              4
+drop_duplicates                       1              8              8
+falco_unmap                           2              1              1
+filter_sites                          2              1              1
+get_covered_positions_by_group        1              1              1
+join_sites_by_group                   2              1              1
+map_to_spikin_by_blastn               1             24             24
+merge_mutated_treated_bam             1             16             16
+merge_unmap                           1             12             12
+prefilter_positions_by_group          4             24             24
+report_falco_unmap                    1              1              1
+report_rnaseqc                        1              1              1
+report_star                           1              1              1
+rnaseq_qc                             1              1              1
+separate_genome_combined              1              4              4
+separate_genome_dedup                 1              4              4
+spike_fasta                           1              1              1
+stat_dedup                            1              2              2
+stat_mapping                          1              2              2
+total                                50              1             32
+
+[Sat Oct  1 02:29:59 2022]
+Error in rule prefilter_positions_by_group:
+    jobid: 245
+    output: filter_positions_by_group/HeLa-WT_sncRNA_T.bed
+    shell:
+        
+        /opt/pipeline/bin/sacseq_caller -i merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa -b T -f 99 147 -d 3 -m 1 -F 3584 |             awk 'BEGIN{OFS="\t"}{print $1,$2-1,$2,$4"/"$5,$4/$5,"-"}' >filter_positions_by_group/HeLa-WT_sncRNA_T.bed
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+[Sat Oct  1 02:29:59 2022]
+Error in rule prefilter_positions_by_group:
+    jobid: 236
+    output: filter_positions_by_group/HeLa-WT_sncRNA_A.bed
+    shell:
+        
+        /opt/pipeline/bin/sacseq_caller -i merged_mutated_reads_by_group/HeLa-WT_sncRNA.bam -r /home/yec/projects/m6A_SACseq/m6A-SACseq/test/ref/sncRNA_human.fa -b A -f 83 163 -d 3 -m 1 -F 3584 |             awk 'BEGIN{OFS="\t"}{print $1,$2-1,$2,$4"/"$5,$4/$5,"+"}' >filter_positions_by_group/HeLa-WT_sncRNA_A.bed
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Exiting because a job execution failed. Look above for error message
