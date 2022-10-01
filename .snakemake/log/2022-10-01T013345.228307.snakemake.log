@@ -1,4 +1,0 @@
-Config file config.yaml is extended by additional config specified via the command line.
-SystemExit in line 22 of /home/yec/projects/m6A_SACseq/m6A-SACseq/Snakefile:
-`samples` is not defined in config file!
-  File "/home/yec/projects/m6A_SACseq/m6A-SACseq/Snakefile", line 22, in <module>

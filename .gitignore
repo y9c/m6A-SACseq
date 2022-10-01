@@ -2,3 +2,4 @@ test/rawdata
 test/workspace
 test/ref
 .panoptes.db
+.snakemake
