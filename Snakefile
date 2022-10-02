@@ -2,9 +2,6 @@ import sys
 from collections import defaultdict
 
 
-configfile: "config.yaml"
-
-
 workdir: config["workdir"]
 
 
