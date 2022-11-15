@@ -1,11 +1,11 @@
 srcdir: /opt/pipeline/bin
 
 path:
-  bowtie2: /opt/microconda/bin/bowtie2
-  star: /opt/microconda/bin/STAR
-  samtools: /opt/microconda/bin/samtools
-  bedtools: /opt/microconda/bin/bedtools
-  featureCounts: /opt/microconda/bin/featureCounts
+  bowtie2: /opt/micromamba/bin/bowtie2
+  star: /opt/micromamba/bin/STAR
+  samtools: /opt/micromamba/bin/samtools
+  bedtools: /opt/micromamba/bin/bedtools
+  featureCounts: /opt/micromamba/bin/featureCounts
   rnaseqc: /bin/rnaseqc
   blast2bam: /bin/blast2bam
   rnaseqmut: /bin/rnaseqmut
