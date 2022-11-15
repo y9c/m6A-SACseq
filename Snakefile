@@ -829,12 +829,12 @@ rule prefilter_positions_by_group:
         flag=lambda wildcards: "83 163" if wildcards.refbase == "A" else "99 147",
         strand=lambda wildcards: "+" if wildcards.refbase == "A" else "-",
         path_caller=os.path.join(src_dir, "sacseq_caller"),
-    threads: 24
+    threads: 16
     resources:
-        mem="86G",
+        mem="48G",
     shell:
         """
-        {params.path_caller} -i {input.bam} -r {params.ref} -b {wildcards.refbase} -f {params.flag} -d 3 -m 1 -F 3584 | \
+        {params.path_caller} -t {threads}  -i {input.bam} -r {params.ref} -b {wildcards.refbase} -f {params.flag} -d 3 -m 1 -F 3584 | \
             awk 'BEGIN{{OFS="\\t"}}{{print $1,$2-1,$2,$4"/"$5,$4/$5,"{params.strand}"}}' >{output}
         """
 
@@ -853,12 +853,12 @@ rule count_site_by_sample:
         ref=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
         flag=lambda wildcards: "83 163" if wildcards.refbase == "A" else "99 147",
         path_caller=os.path.join(src_dir, "sacseq_caller"),
-    threads: 8
+    threads: 16
     resources:
-        mem="32G",
+        mem="48G",
     shell:
         """
-        {params.path_caller} -i {input.bam} -s {input.bed} -r {params.ref} -b {wildcards.refbase} -f {params.flag} -d 0 -m 0 -F 3584 >{output}
+        {params.path_caller} -t {threads} -i {input.bam} -s {input.bed} -r {params.ref} -b {wildcards.refbase} -f {params.flag} -d 0 -m 0 -F 3584 >{output}
         """
 
 

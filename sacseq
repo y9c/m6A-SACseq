@@ -5,7 +5,6 @@
 #
 # Created: 2022-04-04 18:49
 
-                                                                              
 logo="
 \033[1;34m ███╗   ███╗ ██████╗  █████╗       ███████╗ █████╗  ██████╗███████╗███████╗ ██████╗  \033[0m
 \033[1;34m ████╗ ████║██╔════╝ ██╔══██╗      ██╔════╝██╔══██╗██╔════╝██╔════╝██╔════╝██╔═══██╗ \033[0m
@@ -31,35 +30,58 @@ snake="/opt/pipeline/Snakefile"
 
 # https://stackoverflow.com/a/62616466/5693642
 # Convenience functions.
-usage_error () { echo >&2 "$(basename $0):  $1"; exit 2; }
-assert_argument () { test "$1" != "$EOL" || usage_error "$2 requires an argument"; }
+usage_error() {
+  echo >&2 "$(basename $0):  $1"
+  exit 2
+}
+assert_argument() { test "$1" != "$EOL" || usage_error "$2 requires an argument"; }
 
 # One loop, nothing more.
 if [ "$#" != 0 ]; then
   EOL=$(echo '\01\03\03\07')
   set -- "$@" "$EOL"
   while [ "$1" != "$EOL" ]; do
-    opt="$1"; shift
+    opt="$1"
+    shift
     case "$opt" in
 
-      # Your options go here.
-      -q|--quite) quite='true';;
-      -j|--jobs|--cores) assert_argument "$1" "$opt"; cores="$1"; shift;;
-      -c|--conf) assert_argument "$1" "$opt"; conf="$1"; shift;;
-      -s|--snake) assert_argument "$1" "$opt"; snake="$1"; shift;;
-      -p|--profile) assert_argument "$1" "$opt"; profile="$1"; shift;;
+    # Your options go here.
+    -q | --quite) quite='true' ;;
+    -j | --jobs | --cores)
+      assert_argument "$1" "$opt"
+      cores="$1"
+      shift
+      ;;
+    -c | --conf)
+      assert_argument "$1" "$opt"
+      conf="$1"
+      shift
+      ;;
+    -s | --snake)
+      assert_argument "$1" "$opt"
+      snake="$1"
+      shift
+      ;;
+    -p | --profile)
+      assert_argument "$1" "$opt"
+      profile="$1"
+      shift
+      ;;
 
-      # Arguments processing. You may remove any unneeded line after the 1st.
-      -|''|[!-]*) set -- "$@" "$opt";;                                          # positional argument, rotate to the end
-      --*=*)      set -- "${opt%%=*}" "${opt#*=}" "$@";;                        # convert '--name=arg' to '--name' 'arg'
-      -[!-]?*)    set -- $(echo "${opt#-}" | sed 's/\(.\)/ -\1/g') "$@";;       # convert '-abc' to '-a' '-b' '-c'
-      --)         while [ "$1" != "$EOL" ]; do set -- "$@" "$1"; shift; done;;  # process remaining arguments as positional
-      -*)         usage_error "unknown option: '$opt'";;                        # catch misspelled options
-      *)          usage_error "this should NEVER happen ($opt)";;               # sanity test for previous patterns
+    # Arguments processing. You may remove any unneeded line after the 1st.
+    - | '' | [!-]*) set -- "$@" "$opt" ;;                             # positional argument, rotate to the end
+    --*=*) set -- "${opt%%=*}" "${opt#*=}" "$@" ;;                    # convert '--name=arg' to '--name' 'arg'
+    -[!-]?*) set -- $(echo "${opt#-}" | sed 's/\(.\)/ -\1/g') "$@" ;; # convert '-abc' to '-a' '-b' '-c'
+    --) while [ "$1" != "$EOL" ]; do
+      set -- "$@" "$1"
+      shift
+    done ;;                                             # process remaining arguments as positional
+    -*) usage_error "unknown option: '$opt'" ;;         # catch misspelled options
+    *) usage_error "this should NEVER happen ($opt)" ;; # sanity test for previous patterns
 
     esac
   done
-  shift  # $EOL
+  shift # $EOL
 fi
 
 panoptes --ip 0.0.0.0 --port 5000 2>/dev/null &
@@ -78,7 +100,15 @@ while true; do
     else
       PROFILE_SETTING=""
     fi
+    printf "\033[0;33m Analyzing...\033[0m"
     snakemake --wms-monitor http://127.0.0.1:5000 -p --rerun-incomplete -s ${snake} -j ${cores} --configfiles /opt/pipeline/config.yaml ${conf} ${PROFILE_SETTING} 1>${LOGFILE} 2>${LOGFILE}
+    if [ $? -eq 0 ]; then
+      printf "\033[0;33m\b\b\b\b\b\b\b\b\b\b\b\b\b\033[0m"
+      printf "\033[0;32m\xE2\x9C\x94\033[0m Successfully finished all jobs."
+    else
+      printf "\033[0;33m\b\b\b\b\b\b\b\b\b\b\b\b\b\033[0m"
+      printf "\033[0;31m\xE2\x9D\x8C\033[0m Jobs exit with error!"
+    fi
     rm .panoptes.db
     kill -s SIGKILL $PANOPTES_PID
     break
