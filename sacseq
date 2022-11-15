@@ -72,6 +72,7 @@ while true; do
     echo -e "\033[0;32mIf you are running this pipeline on a remote server, \033[0m"
     echo -e "\033[0;32mreplace the IP adress with server IP, or set ssh proxy on you local machine.\033[0m"
     LOGFILE="SACSEQ_LOG_$(date +"%F-%H%M%S").txt"
+    echo -e "\033[0;32mREAD DEBUG LOG AT\033[0m ${LOGFILE}"
     if [[ -n ${profile} ]]; then
       PROFILE_SETTING="--profile ${profile}"
     else

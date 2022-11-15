@@ -1,16 +1,16 @@
 srcdir: /opt/pipeline/bin
 
 path:
-  bowtie2: /opt/miniconda/bin/bowtie2
-  star: /opt/miniconda/bin/STAR
-  samtools: /opt/miniconda/bin/samtools
-  bedtools: /opt/miniconda/bin/bedtools
-  rnaseqc: /opt/rnaseqc
-  blast2bam: /opt/blast2bam/bin/blast2bam
-  rnaseqmut: /opt/rnaseqmut/bin/rnaseqmut
-  umicollapse: /opt/UMICollapse/umicollapse.jar
-  featureCounts: /opt/miniconda/bin/featureCounts
-  cpup: /opt/cpup/cpup
+  bowtie2: /opt/microconda/bin/bowtie2
+  star: /opt/microconda/bin/STAR
+  samtools: /opt/microconda/bin/samtools
+  bedtools: /opt/microconda/bin/bedtools
+  featureCounts: /opt/microconda/bin/featureCounts
+  rnaseqc: /bin/rnaseqc
+  blast2bam: /bin/blast2bam
+  rnaseqmut: /bin/rnaseqmut
+  umicollapse: /bin/umicollapse.jar
+  cpup: /bin/cpup
 
 barcode:
   barcode3_r1: AGATCGGAAGAGCACACGTCTG
