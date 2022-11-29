@@ -1,6 +1,6 @@
 [![Docker](https://img.shields.io/docker/pulls/y9ch/sacseq.svg)](https://hub.docker.com/r/y9ch/sacseq)
-[![DOI:10.1038/s41587-022-01243-z](https://zenodo.org/badge/DOI/10.1038/s41587-022-01243-z.svg)](https://doi.org/10.1038/s41587-022-01243-z)
-[![Citation Badge](https://api.juleskreuer.eu/citation-badge.php?doi=10.1038/s41587-022-01243-z)](https://www.nature.com/articles/s41587-022-01243-z/metrics)
+[![DOI:10.1038/s41587-022-01243-z](https://zenodo.org/badge/DOI/10.1038/s41596-022-00765-9.svg)](https://doi.org/10.1038/s41596-022-00765-9)
+[![Citation Badge](https://api.juleskreuer.eu/citation-badge.php?doi=10.1038/s41596-022-00765-9)](https://www.nature.com/articles/s41596-022-00765-9/metrics)
 
 # m<sup>6</sup>A-SAC-seq
 
@@ -105,4 +105,4 @@ https://y9c.github.io/m6A-SACseq/
 
 ## Citation
 
-- Hu, L., Liu, S., Peng, Y. et al. m<sup>6</sup>A RNA modifications are measured at single-base resolution across the mammalian transcriptome. Nat Biotechnol (2022). https://doi.org/10.1038/s41587-022-01243-z
+- Ge, R., Ye, C., Peng, Y. et al. m6A-SAC-seq for quantitative whole transcriptome m6A profiling. Nat Protoc (2022). https://doi.org/10.1038/s41596-022-00765-9
