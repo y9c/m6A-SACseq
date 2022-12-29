@@ -1,6 +1,5 @@
 # x86_64
 FROM debian:bullseye-slim
-RUN echo "This is a analysis pipelie (v2.0) for SAC-seq data" > /README.md
 
 ENV PATH="/opt/pipeline/bin:/bin:/opt/micromamba/bin:$PATH"
 ENV MAMBA_ROOT_PREFIX="/opt/micromamba"
@@ -30,4 +29,7 @@ RUN apt-get purge -y wget git bzip2 make cmake xsltproc gcc g++ pkg-config && ap
 ADD ./bin /opt/pipeline/bin
 COPY ./Snakefile /opt/pipeline/Snakefile
 COPY ./config.yaml /opt/pipeline/config.yaml
-COPY ./sacseq /opt/pipeline/bin/sacseq
+
+COPY ./pipeline /pipeline
+RUN chmod +x /pipeline && echo "This is a analysis pipelie (v2.0) for SAC-seq data" > /README.md
+ENTRYPOINT ["/pipeline"]

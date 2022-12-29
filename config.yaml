@@ -1,4 +1,4 @@
-srcdir: /opt/pipeline/bin
+srcdir: /opt/pipeline/bin/
 
 path:
   bowtie2: /opt/micromamba/bin/bowtie2
@@ -10,7 +10,9 @@ path:
   blast2bam: /bin/blast2bam
   rnaseqmut: /bin/rnaseqmut
   umicollapse: /bin/umicollapse.jar
+  # customized tools
   cpup: /bin/cpup
+  caller: /opt/pipeline/bin/sacseq_caller
 
 barcode:
   barcode3_r1: AGATCGGAAGAGCACACGTCTG

@@ -24,69 +24,53 @@ logo="
 printf "$logo\n"
 
 # Set default values
-conf="data.yaml"
-cores=48
 snake="/opt/pipeline/Snakefile"
+conf="data.yaml"
 
-# https://stackoverflow.com/a/62616466/5693642
-# Convenience functions.
-usage_error() {
-  echo >&2 "$(basename $0):  $1"
-  exit 2
-}
-assert_argument() { test "$1" != "$EOL" || usage_error "$2 requires an argument"; }
-
-# One loop, nothing more.
-if [ "$#" != 0 ]; then
-  EOL=$(echo '\01\03\03\07')
-  set -- "$@" "$EOL"
-  while [ "$1" != "$EOL" ]; do
-    opt="$1"
+POSITIONAL_ARGS=()
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  -j | --jobs | --cores)
+    cores_cmd="$2"
     shift
-    case "$opt" in
+    shift
+    ;;
+  -c | --conf)
+    conf="$2"
+    shift
+    shift
+    ;;
+  -s | --snake)
+    snake="$2"
+    shift
+    shift
+    ;;
+  *)
+    POSITIONAL_ARGS+=("$1")
+    shift
+    ;;
+  esac
+done
+set -- "${POSITIONAL_ARGS[@]}" # restore positional parameters
 
-    # Your options go here.
-    -q | --quite) quite='true' ;;
-    -j | --jobs | --cores)
-      assert_argument "$1" "$opt"
-      cores="$1"
-      shift
-      ;;
-    -c | --conf)
-      assert_argument "$1" "$opt"
-      conf="$1"
-      shift
-      ;;
-    -s | --snake)
-      assert_argument "$1" "$opt"
-      snake="$1"
-      shift
-      ;;
-    -p | --profile)
-      assert_argument "$1" "$opt"
-      profile="$1"
-      shift
-      ;;
-
-    # Arguments processing. You may remove any unneeded line after the 1st.
-    - | '' | [!-]*) set -- "$@" "$opt" ;;                             # positional argument, rotate to the end
-    --*=*) set -- "${opt%%=*}" "${opt#*=}" "$@" ;;                    # convert '--name=arg' to '--name' 'arg'
-    -[!-]?*) set -- $(echo "${opt#-}" | sed 's/\(.\)/ -\1/g') "$@" ;; # convert '-abc' to '-a' '-b' '-c'
-    --) while [ "$1" != "$EOL" ]; do
-      set -- "$@" "$1"
-      shift
-    done ;;                                             # process remaining arguments as positional
-    -*) usage_error "unknown option: '$opt'" ;;         # catch misspelled options
-    *) usage_error "this should NEVER happen ($opt)" ;; # sanity test for previous patterns
-
-    esac
-  done
-  shift # $EOL
+if [ ! -f "${conf}" ]; then
+  echo "${conf} can not be found!"
+  exit 1
+fi
+if [ -z "${cores_cmd}" ]; then
+  cores_conf=$(python -c 'import yaml, sys;print(yaml.safe_load(open(sys.argv[1],"r")).get("cores",""))' ${conf})
+  if [ -z "${cores_conf}" ]; then
+    cores=48
+  else
+    cores=${cores_conf}
+  fi
+else
+  cores=${cores_cmd}
 fi
 
-panoptes --ip 0.0.0.0 --port 5000 2>/dev/null &
+panoptes --ip 0.0.0.0 --port 5000 1>/dev/null 2>/dev/null &
 export PANOPTES_PID=$!
-echo "PANOPTES_PID=$PANOPTES_PID"
+# echo "PANOPTES_PID=$PANOPTES_PID"
 trap 'kill -s SIGKILL $PANOPTES_PID' EXIT
 while true; do
   if curl -s http://127.0.0.1:5000/api/service-info | grep -q running; then
@@ -95,21 +79,16 @@ while true; do
     echo -e "\033[0;32mreplace the IP adress with server IP, or set ssh proxy on you local machine.\033[0m"
     LOGFILE="SACSEQ_LOG_$(date +"%F-%H%M%S").txt"
     echo -e "\033[0;32mREAD DEBUG LOG AT\033[0m ${LOGFILE}"
-    if [[ -n ${profile} ]]; then
-      PROFILE_SETTING="--profile ${profile}"
-    else
-      PROFILE_SETTING=""
-    fi
     printf "\033[0;33m Analyzing...\033[0m"
-    snakemake --wms-monitor http://127.0.0.1:5000 -p --rerun-incomplete -s ${snake} -j ${cores} --configfiles /opt/pipeline/config.yaml ${conf} ${PROFILE_SETTING} 1>${LOGFILE} 2>${LOGFILE}
+    snakemake --wms-monitor http://127.0.0.1:5000 --rerun-incomplete --jobs ${cores} --snakefile ${snake} --configfiles /opt/pipeline/config.yaml ${conf} $@ 1>${LOGFILE} 2>${LOGFILE}
     if [ $? -eq 0 ]; then
       printf "\033[0;33m\b\b\b\b\b\b\b\b\b\b\b\b\b\033[0m"
-      printf "\033[0;32m\xE2\x9C\x94\033[0m Successfully finished all jobs."
+      printf "\033[0;32m\xE2\x9C\x94\033[0m Successfully finished all jobs.\n"
     else
       printf "\033[0;33m\b\b\b\b\b\b\b\b\b\b\b\b\b\033[0m"
-      printf "\033[0;31m\xE2\x9D\x8C\033[0m Jobs exit with error!"
+      printf "\033[0;31m\xE2\x9D\x8C\033[0m Jobs exit with error!\n"
     fi
-    rm .panoptes.db
+    # rm .panoptes.db
     kill -s SIGKILL $PANOPTES_PID
     break
   fi

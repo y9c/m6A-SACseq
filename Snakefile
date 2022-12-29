@@ -104,7 +104,7 @@ rule report_falco_before:
     output:
         "quality_control/report_falco_before.html",
     resources:
-        mem="20G",
+        mem_mb="20000",
     shell:
         "multiqc -f -m fastqc -n {output} {input.reports}"
 
@@ -135,7 +135,7 @@ rule cutadapt:
         primerR=config["barcode"]["RT_primer_R"],
     threads: 20
     resources:
-        mem="30G",
+        mem_mb="30000",
     shell:
         """
         cutadapt -j {threads} \
@@ -195,7 +195,7 @@ rule report_falco_after:
     output:
         "quality_control/report_falco_after.html",
     resources:
-        mem="20G",
+        mem_mb="20000",
     shell:
         "multiqc -f -m fastqc -n {output} {input.reports}"
 
@@ -218,7 +218,7 @@ rule map_to_contamination_by_bowtie2:
         un="bowtie2_mapping/{rn}_contamination.fq",
     threads: 24
     resources:
-        mem="96G",
+        mem_mb="96000",
     shell:
         # The condition is not that stringent
         """
@@ -245,7 +245,7 @@ rule map_to_spike_by_bowtie2:
         un="bowtie2_mapping/{rn}_spike.fq",
     threads: 24
     resources:
-        mem="96G",
+        mem_mb="96000",
     shell:
         """
         export LC_ALL="C"
@@ -271,7 +271,7 @@ rule map_to_sncRNA_by_bowtie2:
         un="bowtie2_mapping/{rn}_sncRNA.fq",
     threads: 24
     resources:
-        mem="96G",
+        mem_mb="96000",
     shell:
         """
         export LC_ALL="C"
@@ -293,7 +293,7 @@ rule sort_and_filter_bam_bowtie2:
         path_samtools=config["path"]["samtools"],
     threads: 8
     resources:
-        mem="32G",
+        mem_mb="32000",
     shell:
         """
         {params.path_samtools} sort -@ {threads} --input-fmt-option 'filter=[NM]<=10' -m 2G -O BAM -o {output} {input}
@@ -321,7 +321,7 @@ rule map_to_genome_by_star:
         reftype="genome",
     threads: 24
     resources:
-        mem="96G",
+        mem_mb="96000",
     shell:
         """
         ulimit -n 20000
@@ -353,7 +353,7 @@ rule compress_star_unmap:
         "star_mapping/{rn}_genome_Unmapped.out.mate{rd}.fq.gz",
     threads: 12
     resources:
-        mem="48G",
+        mem_mb="48000",
     shell:
         """
         bgzip -@ {threads} -l 9 -c {input} > {output}
@@ -419,7 +419,7 @@ rule combine_runs:
         path_samtools=config["path"]["samtools"],
     threads: 4
     resources:
-        mem="16G",
+        mem_mb="16000",
     shell:
         "{params.path_samtools} merge -@ {threads} -o {output} {input}"
 
@@ -484,7 +484,7 @@ rule stat_mapping:
         ],
     threads: 2
     resources:
-        mem="8G",
+        mem_mb="8000",
     shell:
         # {params.path_samtools} flagstats -@ {threads} -O tsv $file | awk -v ref="$ref" '{{FS="\\t";OFS="\\t"}}$3 == "mapped"{{t=$1}}$3 == "primary mapped"{{p=$1}}END{{print ref,p; if(t > p)print ref"_multi",t-p}}' >> {output}
         # echo -e "Input\\t"$(echo $(zcat {input.fq}|wc -l)/4|bc) > {output}
@@ -509,7 +509,7 @@ rule drop_duplicates:
         path_umicollapse=config["path"]["umicollapse"],
     threads: 8
     resources:
-        mem="64G",
+        mem_mb="64000",
     shell:
         """
         export TMPDIR={tmp_dir}
@@ -569,7 +569,7 @@ rule stat_dedup:
         ],
     threads: 2
     resources:
-        mem="8G",
+        mem_mb="8000",
     shell:
         """
         paste <(echo {params.ref} |  tr " " "\n") <(echo {input.bam} |  tr " " "\n") | while read ref file; do
@@ -622,7 +622,7 @@ rule merge_map:
         fq=temp("spike_reads_tmp/ismap/{sample}.fq"),
     threads: 12
     resources:
-        mem="36G",
+        mem_mb="36000",
     shell:
         """
         samtools fastq -@ {threads} -1 {output.r1} -2 {output.r2} -0 /dev/null -s /dev/null -n {input} 
@@ -638,7 +638,7 @@ rule merge_unmap:
         temp("spike_reads_by_run/unmap/{rn}.fq"),
     threads: 12
     resources:
-        mem="36G",
+        mem_mb="36000",
     shell:
         """
         fastp -w {threads} -j /dev/null -h /dev/null -i {input.r1} -I {input.r2} -m --stdout | {{ grep --no-group-separator -A 2 -B 1 -P "CTAGAATTACACCA|TGGTGTAATTCTAG" || true; }} > {output}
@@ -654,7 +654,7 @@ rule combined_unmap:
         temp("spike_reads_tmp/unmap/{sample}.fq"),
     threads: 12
     resources:
-        mem="36G",
+        mem_mb="36000",
     shell:
         """
         cat {input} > {output}
@@ -683,7 +683,7 @@ rule map_to_spikin_by_blastn:
         ref_blast=os.path.join(ref_dir, REF["spikeN"]["blast"]),
     threads: 24
     resources:
-        mem="48G",
+        mem_mb="48000",
     shell:
         """
         blastn -num_threads {threads} -max_target_seqs 1 -db {params.ref_blast} -query {input} -outfmt 5 > {output}
@@ -701,7 +701,7 @@ rule blastn_to_bam:
         ref_fa=os.path.join(ref_dir, REF["spikeN"]["fa"]),
     threads: 2
     resources:
-        mem="8G",
+        mem_mb="8000",
     shell:
         """
         {params.path_blast2bam} {input.xml} {params.ref_fa} {input.fq} | \
@@ -716,7 +716,7 @@ rule blastn_bam_sort:
         "spike_aligned/{sample}.bam",
     threads: 4
     resources:
-        mem="16G",
+        mem_mb="16000",
     shell:
         """
         samtools sort -@ {threads} -m 12G --write-index {input} -o {output}
@@ -733,7 +733,7 @@ rule call_mutation_of_spike:
         header="\t".join(["ref", "motif", "base", "count"]),
     threads: 4
     resources:
-        mem="12G",
+        mem_mb="12000",
     shell:
         """
         (
@@ -760,7 +760,7 @@ rule count_genome_multiple:
         path_featureCounts=config["path"]["featureCounts"],
     threads: 32
     resources:
-        mem="42G",
+        mem_mb="42000",
     shell:
         "{params.path_featureCounts} -T {threads} -O --largestOverlap -t exon -g gene_name -a {params.gtf} -o {output} {input}"
 
@@ -782,7 +782,7 @@ rule get_covered_positions_by_group:
         ref=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
     threads: 1
     resources:
-        mem="4G",
+        mem_mb="4000",
     # m6a lib is reverse
     # do not use samtools depth, it can not output the reference base
     shell:
@@ -813,7 +813,7 @@ rule merge_mutated_treated_bam:
         path_samtools=config["path"]["samtools"],
     threads: 16
     resources:
-        mem="64G",
+        mem_mb="64000",
     shell:
         "{params.path_samtools} merge --write-index -@ {threads} --input-fmt-option 'filter=[NM]>0' -o {output.bam}##idx##{output.bai} {input}"
 
@@ -828,10 +828,10 @@ rule prefilter_positions_by_group:
         ref=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
         flag=lambda wildcards: "83 163" if wildcards.refbase == "A" else "99 147",
         strand=lambda wildcards: "+" if wildcards.refbase == "A" else "-",
-        path_caller=os.path.join(src_dir, "sacseq_caller"),
+        path_caller=config["path"]["caller"],
     threads: 16
     resources:
-        mem="48G",
+        mem_mb="48000",
     shell:
         """
         {params.path_caller} -t {threads}  -i {input.bam} -r {params.ref} -b {wildcards.refbase} -f {params.flag} -d 3 -m 1 -F 3584 | \
@@ -852,10 +852,10 @@ rule count_site_by_sample:
     params:
         ref=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
         flag=lambda wildcards: "83 163" if wildcards.refbase == "A" else "99 147",
-        path_caller=os.path.join(src_dir, "sacseq_caller"),
+        path_caller=config["path"]["caller"],
     threads: 16
     resources:
-        mem="48G",
+        mem_mb="48000",
     shell:
         """
         {params.path_caller} -t {threads} -i {input.bam} -s {input.bed} -r {params.ref} -b {wildcards.refbase} -f {params.flag} -d 0 -m 0 -F 3584 >{output}
@@ -875,7 +875,7 @@ rule join_sites_by_group:
         sample=lambda wildcards: group2sample[wildcards.group],
         py=os.path.join(src_dir, "join_samples_sites.py"),
     resources:
-        mem="12G",
+        mem_mb="12000",
     shell:
         """
         {params.py} -f {input} -n {params.sample} {params.sample} -o {output}
@@ -891,7 +891,7 @@ rule filter_sites:
         py=os.path.join(src_dir, "filter_group_sites.py"),
         fa=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
     resources:
-        mem="12G",
+        mem_mb="12000",
     shell:
         """
         {params.py} {params.fa} {input} {output}
