@@ -81,7 +81,7 @@ The entire analysis can be completed in just three steps:
 2. **Run all the analysis by one command**:
 
    ```bash
-   singularity exec docker://y9ch/sacseq:latest sacseq
+   singularity run docker://y9ch/sacseq:latest
    ```
 
     <details>
