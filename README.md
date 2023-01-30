@@ -120,9 +120,8 @@ https://y9c.github.io/m6A-SACseq/
   <a href="https://github.com/y9c" target="_blank">Chang Y</a>
 </p>
 <p align="center">
-  <a href="https://github.com/y9c/m6A-SACseq/blob/master/LICENSE"
-    ><img
-      src="https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=GPLv3&logoColor=d9e0ee&colorA=282a36&colorB=c678d
-  /></a>
+  <a href="https://github.com/y9c/m6A-SACseq/blob/master/LICENSE">
+    <img src="https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=GPLv3&logoColor=d9e0ee&colorA=282a36&colorB=c678dd" />
+  </a>
 </p>
 
