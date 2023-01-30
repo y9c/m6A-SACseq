@@ -106,3 +106,23 @@ https://y9c.github.io/m6A-SACseq/
 ## Citation
 
 - Ge, R., Ye, C., Peng, Y. et al. m6A-SAC-seq for quantitative whole transcriptome m6A profiling. Nat Protoc (2022). https://doi.org/10.1038/s41596-022-00765-9
+
+
+&nbsp;
+
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/y9c/y9c/master/resource/footer_line.svg?sanitize=true"
+  />
+</p>
+<p align="center">
+  Copyright &copy; 2021-present
+  <a href="https://github.com/y9c" target="_blank">Chang Y</a>
+</p>
+<p align="center">
+  <a href="https://github.com/y9c/m6A-SACseq/blob/master/LICENSE"
+    ><img
+      src="https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=GPLv3&logoColor=d9e0ee&colorA=282a36&colorB=c678d
+  /></a>
+</p>
+
