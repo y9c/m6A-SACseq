@@ -81,8 +81,11 @@ The entire analysis can be completed in just three steps:
 2. **Run all the analysis by one command**:
 
    ```bash
-   singularity run docker://y9ch/sacseq:latest
+   apptainer run docker://y9ch/sacseq:latest
    ```
+
+   Note that when you storge your input file in a mounted partition, don't forget to add `--bind / -B` command to mount the partition.
+   For example, using `apptainer run -B /data docker://sacseq:latest`...
 
     <details>
       <summary>default settings<sup>(Click to expand)</sup></summary>
@@ -107,7 +110,6 @@ https://y9c.github.io/m6A-SACseq/
 
 - Ge, R., Ye, C., Peng, Y. et al. m6A-SAC-seq for quantitative whole transcriptome m6A profiling. Nat Protoc (2022). https://doi.org/10.1038/s41596-022-00765-9
 
-
 &nbsp;
 
 <p align="center">
@@ -124,4 +126,3 @@ https://y9c.github.io/m6A-SACseq/
     <img src="https://img.shields.io/static/v1.svg?style=for-the-badge&label=License&message=GPLv3&logoColor=d9e0ee&colorA=282a36&colorB=c678dd" />
   </a>
 </p>
-
