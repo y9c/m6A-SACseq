@@ -8,7 +8,6 @@ workdir: config["workdir"]
 src_dir = config["srcdir"]
 tmp_dir = config["tmpdir"]
 data_dir = os.path.dirname(workflow.configfiles[-1])
-ref_dir = data_dir
 
 if "samples" not in config:
     sys.exit("`samples` is not defined in config file!")
@@ -17,8 +16,16 @@ if "references" not in config:
     sys.exit("`references` is not defined in config file!")
 
 REF = config["references"]
-# print(workflow.basedir)
-REFTYPES = ["contamination", "spike", "sncRNA"]
+for k, v in REF.items():
+    for k2, v2 in v.items():
+        v2 = os.path.expanduser(v2)
+        if not os.path.isabs(v2):
+            REF[k][k2] = os.path.join(data_dir, v2)
+        else:
+            REF[k][k2] = v2
+
+
+REFTYPES = ["contamination", "genes"] if "contamination" in REF else ["genes"]
 
 
 group2sample = defaultdict(list)
@@ -61,7 +68,6 @@ rule all:
         expand("stat_reads/{sample}.tsv", sample=sample_ids),
         expand("stat_mapping/{sample}.tsv", sample=sample_ids),
         expand("stat_dedup/{sample}.tsv", sample=sample_ids),
-        expand("spike_aligned/{sample}.tsv.gz", sample=sample_ids),
         "count_reads/genome_single.count",
         expand(
             "count_depth_by_sample/{sample}_{reftype}.tsv.gz",
@@ -71,7 +77,7 @@ rule all:
         expand(
             "pileup_filtered_by_group/{group}_{reftype}.tsv.gz",
             group=group_ids,
-            reftype=["sncRNA", "genome"],
+            reftype=["genes", "genome"],
         ),
 
 
@@ -103,8 +109,6 @@ rule report_falco_before:
         ),
     output:
         "quality_control/report_falco_before.html",
-    resources:
-        mem_mb="20000",
     shell:
         "multiqc -f -m fastqc -n {output} {input.reports}"
 
@@ -134,8 +138,6 @@ rule cutadapt:
         primerF=config["barcode"]["RT_primer_F"],
         primerR=config["barcode"]["RT_primer_R"],
     threads: 20
-    resources:
-        mem_mb="30000",
     shell:
         """
         cutadapt -j {threads} \
@@ -194,8 +196,6 @@ rule report_falco_after:
         ),
     output:
         "quality_control/report_falco_after.html",
-    resources:
-        mem_mb="20000",
     shell:
         "multiqc -f -m fastqc -n {output} {input.reports}"
 
@@ -214,11 +214,9 @@ rule map_to_contamination_by_bowtie2:
         report="bowtie2_mapping/{rn}_contamination.report",
     params:
         path_bowtie2=config["path"]["bowtie2"],
-        ref_bowtie2=lambda wildcards: os.path.join(ref_dir, REF["contamination"]["bt2"]),
+        ref_bowit2=REF["contamination"]["bt2"] if "contamination" in REF else "",
         un="bowtie2_mapping/{rn}_contamination.fq",
     threads: 24
-    resources:
-        mem_mb="96000",
     shell:
         # The condition is not that stringent
         """
@@ -227,55 +225,31 @@ rule map_to_contamination_by_bowtie2:
         """
 
 
-## Mapping: 2, spike
+## Mapping: 2, spike + rRNA + tRNA + snRNA, etc.
 
 
-rule map_to_spike_by_bowtie2:
+rule map_to_genes_by_bowtie2:
     input:
-        r1="bowtie2_mapping/{rn}_contamination.1.fq",
-        r2="bowtie2_mapping/{rn}_contamination.2.fq",
+        [
+            "bowtie2_mapping/{rn}_contamination.1.fq",
+            "bowtie2_mapping/{rn}_contamination.2.fq",
+        ]
+        if "contamination" in REF
+        else ["cut_adapter/{rn}_cut_R1.fq.gz", "cut_adapter/{rn}_cut_R2.fq.gz"],
     output:
-        sam=temp("bowtie2_mapping/{rn}_spike.sam"),
-        un1=temp("bowtie2_mapping/{rn}_spike.1.fq"),
-        un2=temp("bowtie2_mapping/{rn}_spike.2.fq"),
-        report="bowtie2_mapping/{rn}_spike.report",
+        sam=temp("bowtie2_mapping/{rn}_genes.sam"),
+        un1=temp("bowtie2_mapping/{rn}_genes.1.fq"),
+        un2=temp("bowtie2_mapping/{rn}_genes.2.fq"),
+        report="bowtie2_mapping/{rn}_genes.report",
     params:
         path_bowtie2=config["path"]["bowtie2"],
-        ref_bowtie2=lambda wildcards: os.path.join(ref_dir, REF["spike"]["bt2"]),
-        un="bowtie2_mapping/{rn}_spike.fq",
+        ref_bowtie2=REF["genes"]["bt2"],
+        un="bowtie2_mapping/{rn}_genes.fq",
     threads: 24
-    resources:
-        mem_mb="96000",
     shell:
         """
         export LC_ALL="C"
-        {params.path_bowtie2} -p {threads} --nofw --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2> >(tee {output.report} >&2)
-        """
-
-
-## Mapping: 3, rRNA + tRNA + snRNA, etc.
-
-
-rule map_to_sncRNA_by_bowtie2:
-    input:
-        r1="bowtie2_mapping/{rn}_spike.1.fq",
-        r2="bowtie2_mapping/{rn}_spike.2.fq",
-    output:
-        sam=temp("bowtie2_mapping/{rn}_sncRNA.sam"),
-        un1=temp("bowtie2_mapping/{rn}_sncRNA.1.fq"),
-        un2=temp("bowtie2_mapping/{rn}_sncRNA.2.fq"),
-        report="bowtie2_mapping/{rn}_sncRNA.report",
-    params:
-        path_bowtie2=config["path"]["bowtie2"],
-        ref_bowtie2=lambda wildcards: os.path.join(ref_dir, REF["sncRNA"]["bt2"]),
-        un="bowtie2_mapping/{rn}_sncRNA.fq",
-    threads: 24
-    resources:
-        mem_mb="96000",
-    shell:
-        """
-        export LC_ALL="C"
-        {params.path_bowtie2} -p {threads} --nofw --all --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input.r1} -2 {input.r2} > {output.sam} 2> >(tee {output.report} >&2)
+        {params.path_bowtie2} -p {threads} --nofw --all --no-unal --end-to-end -L 16 -N 1 --mp 5 --un-conc {params.un} -x {params.ref_bowtie2} -1 {input[0]} -2 {input[1]} > {output.sam} 2> >(tee {output.report} >&2)
         """
 
 
@@ -288,12 +262,10 @@ rule sort_and_filter_bam_bowtie2:
     output:
         "run_mapping/{rn}_{reftype}.bam",
     wildcard_constraints:
-        reftype="contamination|spike|sncRNA",
+        reftype="contamination|genes",
     params:
         path_samtools=config["path"]["samtools"],
     threads: 8
-    resources:
-        mem_mb="32000",
     shell:
         """
         {params.path_samtools} sort -@ {threads} --input-fmt-option 'filter=[NM]<=10' -m 2G -O BAM -o {output} {input}
@@ -305,23 +277,21 @@ rule sort_and_filter_bam_bowtie2:
 
 rule map_to_genome_by_star:
     input:
-        "bowtie2_mapping/{rn}_sncRNA.1.fq",
-        "bowtie2_mapping/{rn}_sncRNA.2.fq",
+        "bowtie2_mapping/{rn}_genes.1.fq",
+        "bowtie2_mapping/{rn}_genes.2.fq",
     output:
         bam="run_mapping/{rn}_genome.bam",
         log="star_mapping/{rn}_genome_Log.final.out",
         fq_1=temp("star_mapping/{rn}_genome_Unmapped.out.mate1"),
         fq_2=temp("star_mapping/{rn}_genome_Unmapped.out.mate2"),
     params:
-        star_ref=lambda wildcards: os.path.join(ref_dir, REF["genome"]["star"]),
+        star_ref=REF["genome"]["star"],
         star_path=config["path"]["star"],
         output_pre="star_mapping/{rn}_genome_",
         bam="star_mapping/{rn}_genome_Aligned.sortedByCoord.out.bam",
     wildcard_constraints:
         reftype="genome",
     threads: 24
-    resources:
-        mem_mb="96000",
     shell:
         """
         ulimit -n 20000
@@ -352,8 +322,6 @@ rule compress_star_unmap:
     output:
         "star_mapping/{rn}_genome_Unmapped.out.mate{rd}.fq.gz",
     threads: 12
-    resources:
-        mem_mb="48000",
     shell:
         """
         bgzip -@ {threads} -l 9 -c {input} > {output}
@@ -418,8 +386,6 @@ rule combine_runs:
     params:
         path_samtools=config["path"]["samtools"],
     threads: 4
-    resources:
-        mem_mb="16000",
     shell:
         "{params.path_samtools} merge -@ {threads} -o {output} {input}"
 
@@ -483,8 +449,6 @@ rule stat_mapping:
             "genome_multi",
         ],
     threads: 2
-    resources:
-        mem_mb="8000",
     shell:
         # {params.path_samtools} flagstats -@ {threads} -O tsv $file | awk -v ref="$ref" '{{FS="\\t";OFS="\\t"}}$3 == "mapped"{{t=$1}}$3 == "primary mapped"{{p=$1}}END{{print ref,p; if(t > p)print ref"_multi",t-p}}' >> {output}
         # echo -e "Input\\t"$(echo $(zcat {input.fq}|wc -l)/4|bc) > {output}
@@ -508,8 +472,6 @@ rule drop_duplicates:
     params:
         path_umicollapse=config["path"]["umicollapse"],
     threads: 8
-    resources:
-        mem_mb="64000",
     shell:
         """
         export TMPDIR={tmp_dir}
@@ -568,8 +530,6 @@ rule stat_dedup:
             "genome_multi",
         ],
     threads: 2
-    resources:
-        mem_mb="8000",
     shell:
         """
         paste <(echo {params.ref} |  tr " " "\n") <(echo {input.bam} |  tr " " "\n") | while read ref file; do
@@ -587,7 +547,7 @@ rule rnaseq_qc:
     output:
         "rnaseq_qc/{sample}.metrics.tsv",
     params:
-        gtf=lambda wildcards: os.path.join(ref_dir, REF["genome"]["gtf_collapse"]),
+        gtf=REF["genome"]["gtf"],
         path_rnaseqc=config["path"]["rnaseqc"],
         outdir="rnaseq_qc",
     shell:
@@ -610,138 +570,6 @@ rule report_rnaseqc:
 
 ################################################################################
 
-## redo spikin alignment by blast
-
-
-rule merge_map:
-    input:
-        "drop_duplicates/{sample}_spike.bam",
-    output:
-        r1=temp("spike_reads_tmp/ismap/{sample}_R1.fq"),
-        r2=temp("spike_reads_tmp/ismap/{sample}_R2.fq"),
-        fq=temp("spike_reads_tmp/ismap/{sample}.fq"),
-    threads: 12
-    resources:
-        mem_mb="36000",
-    shell:
-        """
-        samtools fastq -@ {threads} -1 {output.r1} -2 {output.r2} -0 /dev/null -s /dev/null -n {input} 
-        fastp -w {threads} -j /dev/null -h /dev/null -i {output.r1} -I {output.r2} -m --merged_out {output.fq}
-        """
-
-
-rule merge_unmap:
-    input:
-        r1="star_mapping/{rn}_genome_Unmapped.out.mate1.fq.gz",
-        r2="star_mapping/{rn}_genome_Unmapped.out.mate2.fq.gz",
-    output:
-        temp("spike_reads_by_run/unmap/{rn}.fq"),
-    threads: 12
-    resources:
-        mem_mb="36000",
-    shell:
-        """
-        fastp -w {threads} -j /dev/null -h /dev/null -i {input.r1} -I {input.r2} -m --stdout | {{ grep --no-group-separator -A 2 -B 1 -P "CTAGAATTACACCA|TGGTGTAATTCTAG" || true; }} > {output}
-        """
-
-
-rule combined_unmap:
-    input:
-        lambda wildcards: [
-            f"spike_reads_by_run/unmap/{r}.fq" for r in sample2run[wildcards.sample]
-        ],
-    output:
-        temp("spike_reads_tmp/unmap/{sample}.fq"),
-    threads: 12
-    resources:
-        mem_mb="36000",
-    shell:
-        """
-        cat {input} > {output}
-        """
-
-
-rule spike_fasta:
-    input:
-        "spike_reads_tmp/ismap/{sample}.fq",
-        "spike_reads_tmp/unmap/{sample}.fq",
-    output:
-        fq=temp("spike_reads/{sample}.fq"),
-        fa=temp("spike_reads/{sample}.fa"),
-    shell:
-        """
-        cat {input} | tee {output.fq} | seqtk seq -a > {output.fa}
-        """
-
-
-rule map_to_spikin_by_blastn:
-    input:
-        "spike_reads/{sample}.fa",
-    output:
-        temp("spike_aligned/{sample}.xml"),
-    params:
-        ref_blast=os.path.join(ref_dir, REF["spikeN"]["blast"]),
-    threads: 24
-    resources:
-        mem_mb="48000",
-    shell:
-        """
-        blastn -num_threads {threads} -max_target_seqs 1 -db {params.ref_blast} -query {input} -outfmt 5 > {output}
-        """
-
-
-rule blastn_to_bam:
-    input:
-        xml="spike_aligned/{sample}.xml",
-        fq="spike_reads/{sample}.fq",
-    output:
-        temp("spike_aligned_tmp/{sample}.unsort.bam"),
-    params:
-        path_blast2bam=config["path"]["blast2bam"],
-        ref_fa=os.path.join(ref_dir, REF["spikeN"]["fa"]),
-    threads: 2
-    resources:
-        mem_mb="8000",
-    shell:
-        """
-        {params.path_blast2bam} {input.xml} {params.ref_fa} {input.fq} | \
-            samtools calmd -@ {threads} --input-fmt-option 'filter=pos < 10 && pos + qlen > 33 && !flag.unmap' --output-fmt BAM - {params.ref_fa} 2>/dev/null > {output}
-        """
-
-
-rule blastn_bam_sort:
-    input:
-        "spike_aligned_tmp/{sample}.unsort.bam",
-    output:
-        "spike_aligned/{sample}.bam",
-    threads: 4
-    resources:
-        mem_mb="16000",
-    shell:
-        """
-        samtools sort -@ {threads} -m 12G --write-index {input} -o {output}
-        """
-
-
-rule call_mutation_of_spike:
-    input:
-        "spike_aligned/{sample}.bam",
-    output:
-        "spike_aligned/{sample}.tsv.gz",
-    params:
-        py=os.path.join(src_dir, "call_spike_mutation.py"),
-        header="\t".join(["ref", "motif", "base", "count"]),
-    threads: 4
-    resources:
-        mem_mb="12000",
-    shell:
-        """
-        (
-          echo {params.header:q}
-          {params.py} {input} | awk '{{ t[$0]++ }} END{{ for (i in t) print t[i],i }}' | awk 'BEGIN{{OFS="\\t"}}{{print $2,$3,$4,$1}}'
-        ) | bgzip -@ {threads} -l 9 >{output}
-        """
-
 
 ## Count read
 
@@ -756,11 +584,9 @@ rule count_genome_multiple:
     output:
         "count_reads/genome_single.count",
     params:
-        gtf=lambda wildcards: os.path.join(ref_dir, REF["genome"]["gtf"]),
+        gtf=REF["genome"]["gtf"],
         path_featureCounts=config["path"]["featureCounts"],
     threads: 32
-    resources:
-        mem_mb="42000",
     shell:
         "{params.path_featureCounts} -T {threads} -O --largestOverlap -t exon -g gene_name -a {params.gtf} -o {output} {input}"
 
@@ -779,10 +605,8 @@ rule get_covered_positions_by_group:
         "count_depth_by_sample/{sample}_{reftype}.tsv.gz",
     params:
         path_samtools=config["path"]["samtools"],
-        ref=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
+        ref=lambda wildcards: REF[wildcards.reftype]["fa"],
     threads: 1
-    resources:
-        mem_mb="4000",
     # m6a lib is reverse
     # do not use samtools depth, it can not output the reference base
     shell:
@@ -812,8 +636,6 @@ rule merge_mutated_treated_bam:
     params:
         path_samtools=config["path"]["samtools"],
     threads: 16
-    resources:
-        mem_mb="64000",
     shell:
         "{params.path_samtools} merge --write-index -@ {threads} --input-fmt-option 'filter=[NM]>0' -o {output.bam}##idx##{output.bai} {input}"
 
@@ -825,13 +647,11 @@ rule prefilter_positions_by_group:
     output:
         "filter_positions_by_group/{group}_{reftype}_{refbase}.bed",
     params:
-        ref=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
+        ref=lambda wildcards: REF[wildcards.reftype]["fa"],
         flag=lambda wildcards: "83 163" if wildcards.refbase == "A" else "99 147",
         strand=lambda wildcards: "+" if wildcards.refbase == "A" else "-",
         path_caller=config["path"]["caller"],
     threads: 16
-    resources:
-        mem_mb="48000",
     shell:
         """
         {params.path_caller} -t {threads}  -i {input.bam} -r {params.ref} -b {wildcards.refbase} -f {params.flag} -d 3 -m 1 -F 3584 | \
@@ -850,12 +670,10 @@ rule count_site_by_sample:
     output:
         temp("pileup_bases_by_sample/{group}_{sample}_{reftype}_{refbase}.tsv"),
     params:
-        ref=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
+        ref=lambda wildcards: REF[wildcards.reftype]["fa"],
         flag=lambda wildcards: "83 163" if wildcards.refbase == "A" else "99 147",
         path_caller=config["path"]["caller"],
     threads: 16
-    resources:
-        mem_mb="48000",
     shell:
         """
         {params.path_caller} -t {threads} -i {input.bam} -s {input.bed} -r {params.ref} -b {wildcards.refbase} -f {params.flag} -d 0 -m 0 -F 3584 >{output}
@@ -874,8 +692,6 @@ rule join_sites_by_group:
     params:
         sample=lambda wildcards: group2sample[wildcards.group],
         py=os.path.join(src_dir, "join_samples_sites.py"),
-    resources:
-        mem_mb="12000",
     shell:
         """
         {params.py} -f {input} -n {params.sample} {params.sample} -o {output}
@@ -889,9 +705,7 @@ rule filter_sites:
         "pileup_filtered_by_group/{group}_{reftype}.tsv.gz",
     params:
         py=os.path.join(src_dir, "filter_group_sites.py"),
-        fa=lambda wildcards: os.path.join(ref_dir, REF[wildcards.reftype]["fa"]),
-    resources:
-        mem_mb="12000",
+        fa=lambda wildcards: REF[wildcards.reftype]["fa"],
     shell:
         """
         {params.py} {params.fa} {input} {output}

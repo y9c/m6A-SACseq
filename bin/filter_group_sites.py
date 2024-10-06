@@ -278,9 +278,7 @@ def get_motif(chrom, pos, strand, pad=10):
     if strand == "+":
         s = genome[chrom][pos - 1 - pad : pos + pad].seq.upper()
     else:
-        s = genome[chrom][
-            pos - 1 - pad : pos + pad
-        ].reverse.complement.seq.upper()
+        s = genome[chrom][pos - 1 - pad : pos + pad].reverse.complement.seq.upper()
     return s
 
 
@@ -289,20 +287,20 @@ df = pd.read_csv(sys.argv[2], sep="\t", low_memory=False)
 site_names = list(df.columns)[:3]
 stat_names = list(df.columns)[3:]
 
-df["input_depth"] = df[
-    [c for c in stat_names if "input" in c and "_depth" in c]
-].sum(axis=1)
-df["input_mut"] = df[
-    [c for c in stat_names if "input" in c and "_mut" in c]
-].sum(axis=1)
+df["input_depth"] = df[[c for c in stat_names if "input" in c and "_depth" in c]].sum(
+    axis=1
+)
+df["input_mut"] = df[[c for c in stat_names if "input" in c and "_mut" in c]].sum(
+    axis=1
+)
 df["input_ratio"] = df["input_mut"] / df["input_depth"]
 
 df["treated_depth"] = df[
     [c for c in stat_names if "treated" in c and "_depth" in c]
 ].sum(axis=1)
-df["treated_mut"] = df[
-    [c for c in stat_names if "treated" in c and "_mut" in c]
-].sum(axis=1)
+df["treated_mut"] = df[[c for c in stat_names if "treated" in c and "_mut" in c]].sum(
+    axis=1
+)
 df["treated_ratio"] = df["treated_mut"] / df["treated_depth"]
 
 # "treated_depth >= 10 and treated_mut >= 3 and treated_ratio >= 0.05 and (input_mut < 2 or input_ratio < 0.025)",
@@ -317,9 +315,7 @@ df = (
         )
     )
     .assign(
-        motif=lambda x: x["motif_long"].str[8:10]
-        + "-"
-        + x["motif_long"].str[11:13]
+        motif=lambda x: x["motif_long"].str[8:10] + "-" + x["motif_long"].str[11:13]
     )
     .assign(frac=lambda x: np.clip(x.ratio * x.motif.map(motif2slope), 0, 1))
 )

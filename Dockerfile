@@ -8,10 +8,10 @@ ENV MAMBA_EXE="/bin/micromamba"
 # install system dependencies
 RUN DEBIAN_FRONTEND=noninteractive apt-get update && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get -y --no-install-recommends install tzdata apt-utils wget git bzip2 make cmake xsltproc gcc g++ pkg-config zlib1g-dev libxml2-dev python3 python3-distutils default-jre && apt-get clean && rm -rf /var/lib/apt/lists/*
 # install package by micromamba
-RUN wget -qO- https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj -C /tmp bin/micromamba && cp /tmp/bin/micromamba $MAMBA_EXE && $MAMBA_EXE shell init -s bash -p $MAMBA_ROOT_PREFIX && eval "$($MAMBA_EXE shell hook --shell=posix)" && \
+RUN wget -qO- https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj -C /tmp bin/micromamba && cp /tmp/bin/micromamba $MAMBA_EXE && $MAMBA_EXE shell init -s bash -r $MAMBA_ROOT_PREFIX && eval "$($MAMBA_EXE shell hook --shell=posix)" && \
   micromamba install -n base -y -c conda-forge -c bioconda libzlib falco bowtie2 star samtools bedtools fastp seqtk blast subread pyfaidx && micromamba clean -afy
 # install package by python-pip
-RUN pip install --no-cache-dir snakemake==7.16 cutadapt==4.1 multiqc panoptes-ui numpy pandas pysam 
+RUN pip install --no-cache-dir snakemake==8.14 cutadapt==4.1 multiqc panoptes-ui numpy pandas pysam 
 # install software directly
 RUN wget -q https://github.com/getzlab/rnaseqc/releases/download/v2.4.2/rnaseqc.v2.4.2.linux.gz -O /tmp/rnaseqc.gz && gunzip /tmp/rnaseqc.gz && chmod +x /tmp/rnaseqc && cp /tmp/rnaseqc /bin/rnaseqc && rm -rf /tmp/rnaseqc.gz
 # install blast2bam

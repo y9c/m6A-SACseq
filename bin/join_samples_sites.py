@@ -18,9 +18,7 @@ parser.add_argument(
 parser.add_argument(
     "-n", "--names", nargs="+", help="<Required> input names", required=True
 )
-parser.add_argument(
-    "-o", "--output", help="<Required> output file", required=True
-)
+parser.add_argument("-o", "--output", help="<Required> output file", required=True)
 args = parser.parse_args()
 
 uniq_names = list(dict.fromkeys(args.names))
@@ -55,6 +53,4 @@ df = (
 
 df.columns = ["_".join(c) for c in df.columns]
 
-df.to_csv(
-    args.output, sep="\t", compression={"method": "gzip", "compresslevel": 5}
-)
+df.to_csv(args.output, sep="\t", compression={"method": "gzip", "compresslevel": 5})
